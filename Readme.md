@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Наталья Антоненко](https://up.htmlacademy.ru/javascript/20/user/984707).
-* Наставник: `Неизвестно`.
+* Наставник: [Федор Арбузов](https://up.htmlacademy.ru/javascript/20/user/593785).
 
 ---
 
