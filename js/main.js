@@ -29,6 +29,7 @@
     popupType: '.popup__type',
     popupPhotos: '.popup__photos',
     popupFeature: '.popup__feature',
+    popupFeatures: '.popup__features',
     popupTitle: '.popup__title',
     popupAddress: '.popup__text--address',
     popupPrice: '.popup__text--price',
@@ -210,6 +211,41 @@
     });
   };
 
+  var hideTextParameter = function (firstOffer, pinCard) {
+    var cardFields = ['title', 'text--address', 'text--price', 'type', 'description', 'avatar'];
+    var offerTextParameters = [firstOffer.offer.title, firstOffer.offer.address, firstOffer.offer.price, firstOffer.offer.type,
+      firstOffer.offer.description, firstOffer.author.avatar];
+
+    for (var i = 0; i < offerTextParameters.length; i++) {
+      if (offerTextParameters[i] === '') {
+        pinCard.querySelector('.popup__' + cardFields[i]).classList.add('hidden');
+      }
+    }
+  };
+
+  var hideDoubleParameter = function (firstOffer, pinCard) {
+    var offerDoubleParameters = [firstOffer.offer.rooms, firstOffer.offer.guests, firstOffer.offer.checkin, firstOffer.offer.checkout];
+
+    if (offerDoubleParameters[0] === '' || offerDoubleParameters[1] === '') {
+      pinCard.querySelector(ClassNames.popupCapacity).classList.add('hidden');
+    }
+
+    if (offerDoubleParameters[2] === '' || offerDoubleParameters[3] === '') {
+      pinCard.querySelector(ClassNames.popupTime).classList.add('hidden');
+    }
+  };
+
+  var hideListParameter = function (firstOffer, pinCard) {
+    var offerListParameters = [firstOffer.offer.features, firstOffer.offer.photos];
+    var classesListParameters = [ClassNames.popupFeatures, ClassNames.popupPhotos];
+
+    for (var i = 0; i < offerListParameters.length; i++) {
+      if (offerListParameters[i].length === 0) {
+        pinCard.querySelector(classesListParameters[i]).classList.add('hidden');
+      }
+    }
+  };
+
   var renderCard = function () {
     var pinCard = mapCardTemplate.cloneNode(true);
     var firstOffer = getBookingList()[0];
@@ -225,12 +261,9 @@
     renderPhotos(firstOffer.offer.photos, pinCard);
     pinCard.querySelector(ClassNames.popupAvatar).src = firstOffer.author.avatar;
 
-    Array.from(pinCard.children)
-      .forEach(function (element) {
-        if (element.textContent === '') {
-          element.classList.add('hidden');
-        }
-      });
+    hideTextParameter(firstOffer, pinCard);
+    hideDoubleParameter(firstOffer, pinCard);
+    hideListParameter(firstOffer, pinCard);
 
     return pinCard;
   };
