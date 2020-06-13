@@ -14,20 +14,10 @@
   var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
   var KEY_VALUES = [TITLES, TYPES, CHECKIN, CHECKOUT, DESCRIPTIONS];
-  var Pin = {
-    X: 25,
-    Y: 70
-  };
-  var MapCity = {
-    WIDTH: document.querySelector('.map__overlay').clientWidth,
-    MIN_Y: 130,
-    MAX_Y: 630
-  };
-  var mapHeight = MapCity.MAX_Y - MapCity.MIN_Y;
-
   var ClassNames = {
     popupType: '.popup__type',
     popupPhotos: '.popup__photos',
+    popupPhoto: '.popup__photo',
     popupFeature: '.popup__feature',
     popupFeatures: '.popup__features',
     popupTitle: '.popup__title',
@@ -37,23 +27,45 @@
     popupTime: '.popup__text--time',
     popupDescription: '.popup__description',
     popupAvatar: '.popup__avatar',
-    filtersContainer: '.map__filters-container'
+    filtersContainer: '.map__filters-container',
+    mapOverlay: '.map__overlay',
+    mapPins: '.map__pins',
+    mapPin: '.map__pin',
+    mapCard: '.map__card',
+    map: '.map',
+    mapFaded: '.map--faded',
+    hidden: '.hidden'
   };
+  var Pin = {
+    X: 25,
+    Y: 70
+  };
+  var MapCity = {
+    WIDTH: document.querySelector(ClassNames.mapOverlay).clientWidth,
+    MIN_Y: 130,
+    MAX_Y: 630
+  };
+  var mapHeight = MapCity.MAX_Y - MapCity.MIN_Y;
 
-  var mapPins = document.querySelector('.map__pins');
+
+  var mapPins = document.querySelector(ClassNames.mapPins);
   var mapPinTemplate = document.querySelector('#pin')
     .content
-    .querySelector('.map__pin');
+    .querySelector(ClassNames.mapPin);
   var mapCardTemplate = document.querySelector('#card')
     .content
-    .querySelector('.map__card');
-  var map = document.querySelector('.map');
+    .querySelector(ClassNames.mapCard);
+  var map = document.querySelector(ClassNames.map);
   var cardPhotoTemplate = document.querySelector('#card')
     .content
-    .querySelector('.popup__photo');
+    .querySelector(ClassNames.popupPhoto);
+
+  var getClassWithoutPoint = function (className) {
+    return className.slice(1);
+  };
 
   var showMap = function () {
-    map.classList.remove('map--faded');
+    map.classList.remove(getClassWithoutPoint(ClassNames.mapFaded));
   };
 
   var getRandomNumber = function (max) {
@@ -74,10 +86,10 @@
     };
   };
 
-  var getOfferParameter = function (array) {
-    var randomIndex = getRandomNumber(array.length);
+  var getOfferParameter = function (keyValues) {
+    var randomIndex = getRandomNumber(keyValues.length);
 
-    return array[randomIndex];
+    return keyValues[randomIndex];
   };
 
   var mixElements = function (array) {
@@ -91,8 +103,8 @@
     return array;
   };
 
-  var getOfferElements = function (array) {
-    var randomArray = mixElements(array);
+  var getOfferElements = function (parameterValues) {
+    var randomArray = mixElements(parameterValues);
     var arrayLength = getRandomCeilNumber(randomArray.length);
     var parameterRandomValues = [];
 
@@ -178,34 +190,34 @@
     }
   };
 
-  var renderPhoto = function (index, array) {
+  var renderPhoto = function (index, cardPhotos) {
     var photo = cardPhotoTemplate.cloneNode(true);
-    photo.src = array[index];
+    photo.src = cardPhotos[index];
 
     return photo;
   };
 
-  var renderPhotos = function (array, card) {
+  var renderPhotos = function (cardPhotos, card) {
     var photos = card.querySelector(ClassNames.popupPhotos);
     //  удаляю элемент, потому что был в исходнике
     photos.removeChild(photos.children[0]);
 
-    for (var i = 0; i < array.length; i++) {
-      photos.appendChild(renderPhoto(i, array));
+    for (var i = 0; i < cardPhotos.length; i++) {
+      photos.appendChild(renderPhoto(i, cardPhotos));
     }
   };
 
-  var renderFeatures = function (array, card) {
+  var renderFeatures = function (cardFeatures, card) {
     var features = card.querySelectorAll(ClassNames.popupFeature);
 
     features.forEach(function (element) {
-      element.classList.add('hidden');
+      element.classList.add(getClassWithoutPoint(ClassNames.hidden));
     });
 
     features.forEach(function (element) {
-      for (var i = 0; i < array.length; i++) {
-        if (element.classList.contains('popup__feature--' + array[i])) {
-          element.classList.remove('hidden');
+      for (var i = 0; i < cardFeatures.length; i++) {
+        if (element.classList.contains('popup__feature--' + cardFeatures[i])) {
+          element.classList.remove(getClassWithoutPoint(ClassNames.hidden));
         }
       }
     });
@@ -217,22 +229,31 @@
       firstOffer.offer.description, firstOffer.author.avatar];
 
     for (var i = 0; i < offerTextParameters.length; i++) {
-      if (offerTextParameters[i] === '') {
-        pinCard.querySelector('.popup__' + cardFields[i]).classList.add('hidden');
+      if (!offerTextParameters[i]) {
+        pinCard.querySelector('.popup__' + cardFields[i]).classList.add(getClassWithoutPoint(ClassNames.hidden));
       }
     }
   };
 
   var hideDoubleParameter = function (firstOffer, pinCard) {
-    var offerDoubleParameters = [firstOffer.offer.rooms, firstOffer.offer.guests, firstOffer.offer.checkin, firstOffer.offer.checkout];
+    var offerDoubleParameters = [
+      {
+        parameters: [firstOffer.offer.rooms, firstOffer.offer.guests],
+        classNames: ClassNames.popupCapacity
+      },
+      {
+        parameters: [firstOffer.offer.checkin, firstOffer.offer.checkout],
+        classNames: ClassNames.popupTime
+      }
+    ];
 
-    if (offerDoubleParameters[0] === '' || offerDoubleParameters[1] === '') {
-      pinCard.querySelector(ClassNames.popupCapacity).classList.add('hidden');
-    }
-
-    if (offerDoubleParameters[2] === '' || offerDoubleParameters[3] === '') {
-      pinCard.querySelector(ClassNames.popupTime).classList.add('hidden');
-    }
+    offerDoubleParameters.forEach(function (it) {
+      it.parameters.forEach(function (parameter) {
+        if (!parameter) {
+          pinCard.querySelector(it.classNames).classList.add(getClassWithoutPoint(ClassNames.hidden));
+        }
+      });
+    });
   };
 
   var hideListParameter = function (firstOffer, pinCard) {
@@ -241,7 +262,7 @@
 
     for (var i = 0; i < offerListParameters.length; i++) {
       if (offerListParameters[i].length === 0) {
-        pinCard.querySelector(classesListParameters[i]).classList.add('hidden');
+        pinCard.querySelector(classesListParameters[i]).classList.add(getClassWithoutPoint(ClassNames.hidden));
       }
     }
   };
