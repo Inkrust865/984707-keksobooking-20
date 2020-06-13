@@ -239,18 +239,18 @@
     var offerDoubleParameters = [
       {
         parameters: [firstOffer.offer.rooms, firstOffer.offer.guests],
-        classNames: ClassNames.popupCapacity
+        className: ClassNames.popupCapacity
       },
       {
         parameters: [firstOffer.offer.checkin, firstOffer.offer.checkout],
-        classNames: ClassNames.popupTime
+        className: ClassNames.popupTime
       }
     ];
 
     offerDoubleParameters.forEach(function (it) {
       it.parameters.forEach(function (parameter) {
         if (!parameter) {
-          pinCard.querySelector(it.classNames).classList.add(getClassWithoutPoint(ClassNames.hidden));
+          pinCard.querySelector(it.className).classList.add(getClassWithoutPoint(ClassNames.hidden));
         }
       });
     });
