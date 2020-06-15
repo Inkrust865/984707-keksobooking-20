@@ -34,11 +34,24 @@
     mapCard: '.map__card',
     map: '.map',
     mapFaded: '.map--faded',
-    hidden: '.hidden'
+    hidden: '.hidden',
+    adForm: '.ad-form',
+    adFormDisabled: '.ad-form--disabled',
+    mapFilters: '.map__filters',
+    mainPin: '.map__pin--main',
+    adFormSubmit: '.ad-form__submit'
   };
   var Pin = {
     X: 25,
     Y: 70
+  };
+  var MainPinActive = {
+    X: 31,
+    Y: 84
+  };
+  var MainPinDisabled = {
+    X: 31,
+    Y: 31
   };
   var MapCity = {
     WIDTH: document.querySelector(ClassNames.mapOverlay).clientWidth,
@@ -59,6 +72,13 @@
   var cardPhotoTemplate = document.querySelector('#card')
     .content
     .querySelector(ClassNames.popupPhoto);
+  var adForm = document.querySelector(ClassNames.adForm);
+  var mapFilters = document.querySelector(ClassNames.mapFilters);
+  var mapPinMain = document.querySelector(ClassNames.mainPin);
+  var inputAddress = adForm.querySelector('input[name="address"]');
+  var roomNumber = document.querySelector('#room_number');
+  var capacity = document.querySelector('#capacity');
+  var adFormSubmit = document.querySelector(ClassNames.adFormSubmit);
 
   var getClassWithoutPoint = function (className) {
     return className.slice(1);
@@ -298,7 +318,130 @@
     return fragment;
   };
 
-  showMap();
-  mapPins.appendChild(renderFragment());
-  map.insertBefore(renderCard(), map.querySelector(ClassNames.filtersContainer));
+  var disableFields = function (formFields) {
+    Array.from(formFields)
+      .forEach(function (element) {
+        element.disabled = true;
+      });
+  };
+
+  var activateFields = function (formFields) {
+    Array.from(formFields)
+      .forEach(function (element) {
+        element.disabled = false;
+      });
+  };
+
+  var renderAddress = function (typeMainPin) {
+    var top = Math.floor(parseInt(mapPinMain.style.top, 10));
+    var left = Math.floor(parseInt(mapPinMain.style.left, 10));
+    var mainPinX = left + typeMainPin.X;
+    var mainPinY = top + typeMainPin.Y;
+
+    inputAddress.value = mainPinX + ', ' + mainPinY;
+  };
+
+  var onRoomNumberChange = function () {
+    var capacityValues = Array.from(capacity);
+    capacityValues.forEach(function (option) {
+      option.disabled = false;
+    });
+
+    if (roomNumber.value === '1') {
+      capacityValues.forEach(function (option) {
+        if (option.value !== '1') {
+          option.disabled = true;
+        }
+      });
+    } else if (roomNumber.value === '2') {
+      capacityValues.forEach(function (option) {
+        if (option.value !== '1' && option.value !== '2') {
+          option.disabled = true;
+        }
+      });
+    } else if (roomNumber.value === '3') {
+      capacityValues.forEach(function (option) {
+        if (option.value === '0') {
+          option.disabled = true;
+        }
+      });
+    } else if (roomNumber.value === '100') {
+      capacityValues.forEach(function (option) {
+        if (option.value !== '0') {
+          option.disabled = true;
+        }
+      });
+    }
+  };
+
+  var onCapacityInvalid = function () {
+    if (roomNumber.value === '1') {
+      if (capacity.value !== '1') {
+        capacity.setCustomValidity('Необходимо изменить количество мест');
+      } else {
+        capacity.setCustomValidity('');
+      }
+    } else if (roomNumber.value === '2') {
+      if (capacity.value !== '1' && capacity.value !== '2') {
+        capacity.setCustomValidity('Необходимо изменить количество мест');
+      } else {
+        capacity.setCustomValidity('');
+      }
+    } else if (roomNumber.value === '3') {
+      if (capacity.value === '0') {
+        capacity.setCustomValidity('Необходимо изменить количество мест');
+      } else {
+        capacity.setCustomValidity('');
+      }
+    } else if (roomNumber.value === '100') {
+      if (capacity.value !== '0') {
+        capacity.setCustomValidity('Необходимо изменить количество мест');
+      } else {
+        capacity.setCustomValidity('');
+      }
+    }
+  };
+
+  capacity.addEventListener('invalid', onCapacityInvalid);
+  roomNumber.addEventListener('change', onRoomNumberChange);
+
+  var activatePage = function () {
+    showMap();
+    mapPins.appendChild(renderFragment());
+    map.insertBefore(renderCard(), map.querySelector(ClassNames.filtersContainer));
+
+    adForm.classList.remove(getClassWithoutPoint(ClassNames.adFormDisabled));
+    activateFields(adForm);
+    activateFields(mapFilters);
+
+    renderAddress(MainPinActive);
+  };
+
+  var disablePage = function () {
+    disableFields(adForm);
+    disableFields(mapFilters);
+
+    renderAddress(MainPinDisabled);
+  };
+
+  mapPinMain.addEventListener('mousedown', function () {
+    if (map.classList.contains(getClassWithoutPoint(ClassNames.mapFaded))) {
+      activatePage();
+    }
+  });
+
+  mapPinMain.addEventListener('keydown', function (evt) {
+    if (map.classList.contains(getClassWithoutPoint(ClassNames.mapFaded))) {
+      if (evt.key === 'Enter') {
+        activatePage();
+      }
+    }
+  });
+
+  adFormSubmit.addEventListener('submit', function () {
+    capacity.removeEventListener('invalid', onCapacityInvalid);
+    roomNumber.removeEventListener('change', onRoomNumberChange);
+  });
+
+  disablePage();
 })();
