@@ -78,6 +78,7 @@
   var inputAddress = adForm.querySelector('input[name="address"]');
   var roomNumber = document.querySelector('#room_number');
   var capacity = document.querySelector('#capacity');
+  var capacityOptions = capacity.querySelectorAll('option');
   var adFormSubmit = document.querySelector(ClassNames.adFormSubmit);
 
   var getClassWithoutPoint = function (className) {
@@ -325,11 +326,21 @@
       });
   };
 
+  var renderInitialStateCapacity = function () {
+    capacityOptions.forEach(function (option) {
+      if (option.value !== '1') {
+        option.disabled = true;
+      }
+    });
+  };
+
   var activateFields = function (formFields) {
     Array.from(formFields)
       .forEach(function (element) {
         element.disabled = false;
       });
+
+    renderInitialStateCapacity();
   };
 
   var renderAddress = function (typeMainPin) {
@@ -342,68 +353,83 @@
   };
 
   var onRoomNumberChange = function () {
-    var capacityValues = Array.from(capacity);
-    capacityValues.forEach(function (option) {
-      option.disabled = false;
+    var capacityOptionsValues = Array.from(capacityOptions);
+
+    var roomsAndGuests = [
+      {roomNumber: '1', capacityValues: ['1']},
+      {roomNumber: '2', capacityValues: ['1', '2']},
+      {roomNumber: '3', capacityValues: ['1', '2', '3']},
+      {roomNumber: '100', capacityValues: ['0']}
+    ];
+
+    var rule = roomsAndGuests.find(function (ruleRoom) {
+      return ruleRoom.roomNumber === roomNumber.value;
     });
 
-    if (roomNumber.value === '1') {
-      capacityValues.forEach(function (option) {
-        if (option.value !== '1') {
-          option.disabled = true;
-        }
-      });
-    } else if (roomNumber.value === '2') {
-      capacityValues.forEach(function (option) {
-        if (option.value !== '1' && option.value !== '2') {
-          option.disabled = true;
-        }
-      });
-    } else if (roomNumber.value === '3') {
-      capacityValues.forEach(function (option) {
-        if (option.value === '0') {
-          option.disabled = true;
-        }
-      });
-    } else if (roomNumber.value === '100') {
-      capacityValues.forEach(function (option) {
-        if (option.value !== '0') {
-          option.disabled = true;
-        }
-      });
-    }
+    capacityOptionsValues.forEach(function (option) {
+      option.disabled = !rule.capacityValues.includes(option.value);
+    });
+
+    //  capacityOptionsValues.forEach(function (option) {
+    //  if (!rule.capacityValues.includes(option.value) || ) {
+    //    option.disabled = true;
+    //    capacity.setCustomValidity('Необходимо изменить количество мест');
+    //  } else {
+    //    option.disabled = false;
+    //    capacity.setCustomValidity('');
+    //  }
+    //  });
   };
 
-  var onCapacityInvalid = function () {
-    if (roomNumber.value === '1') {
-      if (capacity.value !== '1') {
+  var onRoomNumberChangeInvalid = function () {
+    var capacityOptionsValues = Array.from(capacityOptions);
+
+    var roomsAndGuests = [
+      {roomNumber: '1', capacityValues: ['1']},
+      {roomNumber: '2', capacityValues: ['1', '2']},
+      {roomNumber: '3', capacityValues: ['1', '2', '3']},
+      {roomNumber: '100', capacityValues: ['1', '2', '3']}
+    ];
+
+    var rule = roomsAndGuests.find(function (ruleRoom) {
+      return ruleRoom.roomNumber === roomNumber.value;
+    });
+
+    capacityOptionsValues.forEach(function (option) {
+      if (!rule.capacityValues.includes(option.value)) {
         capacity.setCustomValidity('Необходимо изменить количество мест');
       } else {
         capacity.setCustomValidity('');
       }
-    } else if (roomNumber.value === '2') {
-      if (capacity.value !== '1' && capacity.value !== '2') {
-        capacity.setCustomValidity('Необходимо изменить количество мест');
-      } else {
-        capacity.setCustomValidity('');
-      }
-    } else if (roomNumber.value === '3') {
-      if (capacity.value === '0') {
-        capacity.setCustomValidity('Необходимо изменить количество мест');
-      } else {
-        capacity.setCustomValidity('');
-      }
-    } else if (roomNumber.value === '100') {
-      if (capacity.value !== '0') {
-        capacity.setCustomValidity('Необходимо изменить количество мест');
-      } else {
-        capacity.setCustomValidity('');
-      }
-    }
+    });
   };
 
-  capacity.addEventListener('invalid', onCapacityInvalid);
+  var onCapacityChange = function () {
+    var capacityOptionsValues = Array.from(capacityOptions);
+
+    var roomsAndGuests = [
+      {roomNumber: '1', capacityValues: ['1']},
+      {roomNumber: '2', capacityValues: ['1', '2']},
+      {roomNumber: '3', capacityValues: ['1', '2', '3']},
+      {roomNumber: '100', capacityValues: ['1', '2', '3']}
+    ];
+
+    var rule = roomsAndGuests.find(function (ruleRoom) {
+      return ruleRoom.roomNumber === roomNumber.value;
+    });
+
+    capacityOptionsValues.forEach(function (option) {
+      if (!rule.capacityValues.includes(option.value)) {
+        capacity.setCustomValidity('');
+      } else {
+        capacity.setCustomValidity('Необходимо изменить количество мест');
+      }
+    });
+  };
+
   roomNumber.addEventListener('change', onRoomNumberChange);
+  roomNumber.addEventListener('change', onRoomNumberChangeInvalid);
+  capacity.addEventListener('change', onCapacityChange);
 
   var activatePage = function () {
     showMap();
@@ -439,7 +465,7 @@
   });
 
   adFormSubmit.addEventListener('submit', function () {
-    capacity.removeEventListener('invalid', onCapacityInvalid);
+    capacity.removeEventListener('invalid', onCapacityChange);
     roomNumber.removeEventListener('change', onRoomNumberChange);
   });
 
