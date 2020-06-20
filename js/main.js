@@ -14,6 +14,12 @@
   var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
   var KEY_VALUES = [TITLES, TYPES, CHECKIN, CHECKOUT, DESCRIPTIONS];
+  var roomsAndGuestsRules = [
+    {roomNumber: '1', accessibilityCapacityValues: ['1'], validityCapacityValues: ['1'], mustChange: 'Необходимо изменить количество мест', valid: ''},
+    {roomNumber: '2', accessibilityCapacityValues: ['1', '2'], validityCapacityValues: ['1', '2']},
+    {roomNumber: '3', accessibilityCapacityValues: ['1', '2', '3'], validityCapacityValues: ['1', '2', '3']},
+    {roomNumber: '100', accessibilityCapacityValues: ['0'], validityCapacityValues: ['1', '2', '3']}
+  ];
   var ClassNames = {
     popupType: '.popup__type',
     popupPhotos: '.popup__photos',
@@ -352,55 +358,31 @@
     inputAddress.value = mainPinX + ', ' + mainPinY;
   };
 
-  var onRoomNumberChange = function () {
-    var capacityOptionsValues = Array.from(capacityOptions);
+  function getCurrentRule(rules) {
+    return rules.find(function (ruleRoom) {
+      return ruleRoom.roomNumber === roomNumber.value;
+    }) || {roomNumber: '', accessibilityCapacityValues: [], validityCapacityValues: []};
+  }
 
-    var roomsAndGuestsRules = [
-      {roomNumber: '1', accessibilityСapacityValues: ['1'], validityCapacityValues: ['1']},
-      {roomNumber: '2', accessibilityСapacityValues: ['1', '2'], validityCapacityValues: ['1', '2']},
-      {roomNumber: '3', accessibilityСapacityValues: ['1', '2', '3'], validityCapacityValues: ['1', '2', '3']},
-      {roomNumber: '100', accessibilityСapacityValues: ['0'], validityCapacityValues: ['1', '2', '3']}
-    ];
-
-    function getCurrentRule(rules) {
-      return rules.find(function (ruleRoom) {
-        return ruleRoom.roomNumber === roomNumber.value;
-      }) || {roomNumber: '', accessibilityСapacityValues: [], validityCapacityValues: []};
+  var getValidityRule = function (option, conditionTrue, conditionFalse) {
+    if (!getCurrentRule(roomsAndGuestsRules).validityCapacityValues.includes(option.value)) {
+      capacity.setCustomValidity(conditionTrue);
+    } else {
+      capacity.setCustomValidity(conditionFalse);
     }
+  };
 
-    var currentRule = getCurrentRule(roomsAndGuestsRules);
+  var onRoomNumberChange = function () {
+    Array.from(capacityOptions).forEach(function (option) {
+      getValidityRule(option, roomsAndGuestsRules[0].mustChange, roomsAndGuestsRules[0].valid);
 
-    capacityOptionsValues.forEach(function (option) {
-      if (!currentRule.validityCapacityValues.includes(option.value)) {
-        capacity.setCustomValidity('Необходимо изменить количество мест');
-      } else {
-        capacity.setCustomValidity('');
-      }
-
-      option.disabled = !currentRule.accessibilityСapacityValues.includes(option.value);
+      option.disabled = !getCurrentRule(roomsAndGuestsRules).accessibilityCapacityValues.includes(option.value);
     });
   };
 
   var onCapacityChange = function () {
-    var capacityOptionsValues = Array.from(capacityOptions);
-
-    var roomsAndGuests = [
-      {roomNumber: '1', capacityValues: ['1']},
-      {roomNumber: '2', capacityValues: ['1', '2']},
-      {roomNumber: '3', capacityValues: ['1', '2', '3']},
-      {roomNumber: '100', capacityValues: ['1', '2', '3']}
-    ];
-
-    var rule = roomsAndGuests.find(function (ruleRoom) {
-      return ruleRoom.roomNumber === roomNumber.value;
-    });
-
-    capacityOptionsValues.forEach(function (option) {
-      if (!rule.capacityValues.includes(option.value)) {
-        capacity.setCustomValidity('');
-      } else {
-        capacity.setCustomValidity('Необходимо изменить количество мест');
-      }
+    Array.from(capacityOptions).forEach(function (option) {
+      getValidityRule(option, roomsAndGuestsRules[0].valid, roomsAndGuestsRules[0].mustChange);
     });
   };
 
