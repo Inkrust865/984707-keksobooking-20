@@ -365,28 +365,36 @@
   }
 
 
-  var setValidityRule = function (option, conditionTrue, conditionFalse, currentRule) {
-    if (!currentRule.validityCapacityValues.includes(option.value)) {
+  var setValidityRule = function (option, conditionTrue, conditionFalse, rule) {
+    if (!rule.validityCapacityValues.includes(option.value)) {
       capacity.setCustomValidity(conditionTrue);
     } else {
       capacity.setCustomValidity(conditionFalse);
     }
   };
 
-  var onRoomNumberChange = function () {
-    var currentRule = getCurrentRule(roomsAndGuestsRules);
-    Array.from(capacityOptions).forEach(function (option) {
-      setValidityRule(option, roomsAndGuestsRules[0].mustChange, roomsAndGuestsRules[0].valid, currentRule);
+  var ruleAcceptation = function (conditionTrue, conditionFalse, disableOption) {
+    disableOption = disableOption || false;
 
-      option.disabled = !currentRule.accessibilityCapacityValues.includes(option.value);
-    });
+    var rule = getCurrentRule(roomsAndGuestsRules);
+
+    Array
+      .from(capacityOptions)
+      .forEach(function (option) {
+        setValidityRule(option, conditionTrue, conditionFalse, rule);
+
+        if (disableOption) {
+          option.disabled = !rule.accessibilityCapacityValues.includes(option.value);
+        }
+      });
+  };
+
+  var onRoomNumberChange = function () {
+    ruleAcceptation(roomsAndGuestsRules[0].mustChange, roomsAndGuestsRules[0].valid, true);
   };
 
   var onCapacityChange = function () {
-    var currentRule = getCurrentRule(roomsAndGuestsRules);
-    Array.from(capacityOptions).forEach(function (option) {
-      setValidityRule(option, roomsAndGuestsRules[0].valid, roomsAndGuestsRules[0].mustChange, currentRule);
-    });
+    ruleAcceptation(roomsAndGuestsRules[0].valid, roomsAndGuestsRules[0].mustChange);
   };
 
   roomNumber.addEventListener('change', onRoomNumberChange);
