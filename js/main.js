@@ -14,6 +14,12 @@
   var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
   var KEY_VALUES = [TITLES, TYPES, CHECKIN, CHECKOUT, DESCRIPTIONS];
+  var roomsAndGuestsRules = [
+    {roomNumber: '1', accessibilityCapacityValues: ['1'], validityCapacityValues: ['1'], mustChange: 'Необходимо изменить количество мест', valid: ''},
+    {roomNumber: '2', accessibilityCapacityValues: ['1', '2'], validityCapacityValues: ['1', '2']},
+    {roomNumber: '3', accessibilityCapacityValues: ['1', '2', '3'], validityCapacityValues: ['1', '2', '3']},
+    {roomNumber: '100', accessibilityCapacityValues: ['0'], validityCapacityValues: ['1', '2', '3']}
+  ];
   var ClassNames = {
     popupType: '.popup__type',
     popupPhotos: '.popup__photos',
@@ -34,11 +40,24 @@
     mapCard: '.map__card',
     map: '.map',
     mapFaded: '.map--faded',
-    hidden: '.hidden'
+    hidden: '.hidden',
+    adForm: '.ad-form',
+    adFormDisabled: '.ad-form--disabled',
+    mapFilters: '.map__filters',
+    mainPin: '.map__pin--main',
+    adFormSubmit: '.ad-form__submit'
   };
   var Pin = {
     X: 25,
     Y: 70
+  };
+  var MainPinActive = {
+    X: 31,
+    Y: 84
+  };
+  var MainPinDisabled = {
+    X: 31,
+    Y: 31
   };
   var MapCity = {
     WIDTH: document.querySelector(ClassNames.mapOverlay).clientWidth,
@@ -59,6 +78,14 @@
   var cardPhotoTemplate = document.querySelector('#card')
     .content
     .querySelector(ClassNames.popupPhoto);
+  var adForm = document.querySelector(ClassNames.adForm);
+  var mapFilters = document.querySelector(ClassNames.mapFilters);
+  var mapPinMain = document.querySelector(ClassNames.mainPin);
+  var inputAddress = adForm.querySelector('input[name="address"]');
+  var roomNumber = document.querySelector('#room_number');
+  var capacity = document.querySelector('#capacity');
+  var capacityOptions = capacity.querySelectorAll('option');
+  var adFormSubmit = document.querySelector(ClassNames.adFormSubmit);
 
   var getClassWithoutPoint = function (className) {
     return className.slice(1);
@@ -298,7 +325,120 @@
     return fragment;
   };
 
-  showMap();
-  mapPins.appendChild(renderFragment());
-  map.insertBefore(renderCard(), map.querySelector(ClassNames.filtersContainer));
+  var disableFields = function (formFields) {
+    Array.from(formFields)
+      .forEach(function (element) {
+        element.disabled = true;
+      });
+  };
+
+  var renderInitialStateCapacity = function () {
+    capacityOptions.forEach(function (option) {
+      if (option.value !== '1') {
+        option.disabled = true;
+      }
+    });
+  };
+
+  var activateFields = function (formFields) {
+    Array.from(formFields)
+      .forEach(function (element) {
+        element.disabled = false;
+      });
+
+    renderInitialStateCapacity();
+  };
+
+  var renderAddress = function (typeMainPin) {
+    var top = Math.floor(parseInt(mapPinMain.style.top, 10));
+    var left = Math.floor(parseInt(mapPinMain.style.left, 10));
+    var mainPinX = left + typeMainPin.X;
+    var mainPinY = top + typeMainPin.Y;
+
+    inputAddress.value = mainPinX + ', ' + mainPinY;
+  };
+
+  function getCurrentRule(rules) {
+    return rules.find(function (ruleRoom) {
+      return ruleRoom.roomNumber === roomNumber.value;
+    }) || {roomNumber: '', accessibilityCapacityValues: [], validityCapacityValues: []};
+  }
+
+
+  var setValidityRule = function (option, conditionTrue, conditionFalse, rule) {
+    if (!rule.validityCapacityValues.includes(option.value)) {
+      capacity.setCustomValidity(conditionTrue);
+    } else {
+      capacity.setCustomValidity(conditionFalse);
+    }
+  };
+
+  var ruleAcceptation = function (conditionTrue, conditionFalse, disableOption) {
+    disableOption = disableOption || false;
+
+    var rule = getCurrentRule(roomsAndGuestsRules);
+
+    Array
+      .from(capacityOptions)
+      .forEach(function (option) {
+        setValidityRule(option, conditionTrue, conditionFalse, rule);
+
+        if (disableOption) {
+          option.disabled = !rule.accessibilityCapacityValues.includes(option.value);
+        }
+      });
+  };
+
+  var onRoomNumberChange = function () {
+    ruleAcceptation(roomsAndGuestsRules[0].mustChange, roomsAndGuestsRules[0].valid, true);
+  };
+
+  var onCapacityChange = function () {
+    ruleAcceptation(roomsAndGuestsRules[0].valid, roomsAndGuestsRules[0].mustChange);
+  };
+
+  roomNumber.addEventListener('change', onRoomNumberChange);
+  capacity.addEventListener('change', onCapacityChange);
+
+  var activatePage = function (evt) {
+    if (evt.button === 0) {
+      showMap();
+      mapPins.appendChild(renderFragment());
+      map.insertBefore(renderCard(), map.querySelector(ClassNames.filtersContainer));
+
+      adForm.classList.remove(getClassWithoutPoint(ClassNames.adFormDisabled));
+      activateFields(adForm);
+      activateFields(mapFilters);
+
+      renderAddress(MainPinActive);
+    }
+  };
+
+  var disablePage = function () {
+    disableFields(adForm);
+    disableFields(mapFilters);
+
+    renderAddress(MainPinDisabled);
+  };
+
+  mapPinMain.addEventListener('mousedown', function (evt) {
+    if (map.classList.contains(getClassWithoutPoint(ClassNames.mapFaded))) {
+      activatePage(evt);
+    }
+  });
+
+  mapPinMain.addEventListener('keydown', function (evt) {
+    if (map.classList.contains(getClassWithoutPoint(ClassNames.mapFaded))) {
+      if (evt.key === 'Enter') {
+        activatePage();
+      }
+    }
+  });
+
+  adFormSubmit.addEventListener('submit', function () {
+    capacity.removeEventListener('invalid', onCapacityChange);
+    roomNumber.removeEventListener('change', onRoomNumberChange);
+  });
+
+  disablePage();
 })();
