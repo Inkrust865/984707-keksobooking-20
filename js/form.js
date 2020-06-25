@@ -35,6 +35,7 @@
       inputAddress.value = mainPinX + ', ' + mainPinY;
     }
   };
+
   var inputAddress = window.form.adForm.querySelector('input[name="address"]');
   var roomNumber = document.querySelector('#room_number');
   var capacity = document.querySelector('#capacity');
