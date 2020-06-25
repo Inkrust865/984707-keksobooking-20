@@ -67,12 +67,6 @@
         avatar: window.util.getAvatar(index)
       };
     },
-    getLocation: function () {
-      return {
-        x: window.mapFile.getLocationX(),
-        y: window.mapFile.getLocationY()
-      };
-    },
     getBookingList: function () {
       var BookingList = [];
 
@@ -80,7 +74,7 @@
         BookingList[i] = {};
         BookingList[i].author = window.util.getAuthor(i);
         BookingList[i].offer = getOffer();
-        BookingList[i].location = window.util.getLocation();
+        BookingList[i].location = window.mapFile.getLocation();
       }
 
       return BookingList;

@@ -16,6 +16,12 @@
     getLocationY: function () {
       return window.util.getRandomNumber(window.mapFile.mapHeight - window.pin.Pin.Y) + MapCity.MIN_Y;
     },
+    getLocation: function () {
+      return {
+        x: window.mapFile.getLocationX(),
+        y: window.mapFile.getLocationY()
+      };
+    },
     showMap: function () {
       window.mapFile.map.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapFaded));
     },
