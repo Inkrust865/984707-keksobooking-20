@@ -40,11 +40,11 @@
 
     evt.preventDefault();
 
+    var scroll = window.pageYOffset;
     var startCoords = {
       x: evt.clientX,
       y: evt.clientY
     };
-
     var dragged = false;
 
     var onMouseMove = function (moveEvt) {
@@ -65,13 +65,15 @@
       if (startCoords.x > mapPinBorderLeft && startCoords.x < mapPinBorderRight) {
         window.form.mapPinMain.style.left = (window.form.mapPinMain.offsetLeft - shift.x) + 'px';
 
-        if (startCoords.y > mapPinBorderTop && startCoords.y < mapPinBorderBottom) {
+        if (startCoords.y > mapPinBorderTop - scroll && startCoords.y < mapPinBorderBottom - scroll) {
           window.form.mapPinMain.style.top = (window.form.mapPinMain.offsetTop - shift.y) + 'px';
         }
       } else {
         window.form.mapPinMain.style.top = window.form.mapPinMain.offsetTop + 'px';
         window.form.mapPinMain.style.left = window.form.mapPinMain.offsetLeft + 'px';
       }
+
+      window.form.renderAddress(window.form.MainPinActive);
     };
 
     var onMouseUp = function (upEvt) {

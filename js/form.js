@@ -5,7 +5,7 @@
     adForm: document.querySelector(window.ClassNames.adForm),
     mapPinMain: document.querySelector(window.ClassNames.mainPin),
     MainPinActive: {
-      X: 32.5,
+      X: 33,
       Y: 84
     },
     MainPinDisabled: {
