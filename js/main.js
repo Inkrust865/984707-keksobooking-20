@@ -2,14 +2,13 @@
 
 (function () {
   var mapPins = document.querySelector(window.ClassNames.mapPins);
-  var mainTag = document.querySelector('main');
-  var mapPinBorderRight = mainTag.offsetLeft + window.mapFile.map.clientWidth - (window.form.mapPinMain.clientWidth / 2);
-  var mapPinBorderLeft = mainTag.offsetLeft + (window.form.mapPinMain.clientWidth / 2);
+  var mapPinBorderRight = window.mapFile.map.clientWidth - window.form.MainPinActive.X;
+  var mapPinBorderLeft = -(window.form.MainPinActive.X);
   var MapCity = {
     MIN_Y: 130,
     MAX_Y: 630
   };
-  var mapPinBorderTop = MapCity.MIN_Y;
+  var mapPinBorderTop = MapCity.MIN_Y - window.form.MainPinActive.Y;
   var mapPinBorderBottom = MapCity.MAX_Y - window.form.MainPinActive.Y;
 
   var activatePage = function () {
@@ -40,7 +39,6 @@
 
     evt.preventDefault();
 
-    var scroll = window.pageYOffset;
     var startCoords = {
       x: evt.clientX,
       y: evt.clientY
@@ -62,12 +60,12 @@
         y: moveEvt.clientY
       };
 
-      if (startCoords.x > mapPinBorderLeft && startCoords.x < mapPinBorderRight) {
-        window.form.mapPinMain.style.left = (window.form.mapPinMain.offsetLeft - shift.x) + 'px';
+      var newX = window.form.mapPinMain.offsetLeft - shift.x;
+      var newY = window.form.mapPinMain.offsetTop - shift.y;
 
-        if (startCoords.y > mapPinBorderTop - scroll && startCoords.y < mapPinBorderBottom - scroll) {
-          window.form.mapPinMain.style.top = (window.form.mapPinMain.offsetTop - shift.y) + 'px';
-        }
+      if (newX >= mapPinBorderLeft && newX <= mapPinBorderRight && newY >= mapPinBorderTop && newY <= mapPinBorderBottom) {
+        window.form.mapPinMain.style.left = newX + 'px';
+        window.form.mapPinMain.style.top = newY + 'px';
       } else {
         window.form.mapPinMain.style.top = window.form.mapPinMain.offsetTop + 'px';
         window.form.mapPinMain.style.left = window.form.mapPinMain.offsetLeft + 'px';
