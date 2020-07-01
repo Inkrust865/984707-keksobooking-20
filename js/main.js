@@ -2,6 +2,9 @@
 
 (function () {
   var mapPins = document.querySelector(window.ClassNames.mapPins);
+  var MouseButtons = {
+    left: 0
+  };
 
   var activatePage = function () {
     window.mapFile.showMap();
@@ -25,7 +28,7 @@
   window.main = {
     onMainPinFirstPress: function (evt) {
       if (window.mapFile.map.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mapFaded))) {
-        if (evt.button === 0) {
+        if (evt.button === MouseButtons.left) {
           activatePage(evt);
         }
       }
