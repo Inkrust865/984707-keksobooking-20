@@ -4,7 +4,7 @@
   window.card = {
     renderCard: function () {
       var pinCard = mapCardTemplate.cloneNode(true);
-      var firstOffer = window.util.getBookingList()[0];
+      var firstOffer = window.util.BookingList[9];
 
       pinCard.querySelector(window.ClassNames.popupTitle).textContent = firstOffer.offer.title;
       pinCard.querySelector(window.ClassNames.popupAddress).textContent = firstOffer.offer.address;

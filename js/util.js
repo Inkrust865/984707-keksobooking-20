@@ -2,7 +2,7 @@
 
 (function () {
   var ENTER_KEYCODE = 13;
-  var KEY_VALUES = [window.data.TITLES, window.data.TYPES, window.data.CHECKIN, window.data.CHECKOUT, window.data.DESCRIPTIONS];
+  /*  var KEY_VALUES = [window.data.TITLES, window.data.TYPES, window.data.CHECKIN, window.data.CHECKOUT, window.data.DESCRIPTIONS];
 
   var getOfferParameter = function (keyValues) {
     var randomIndex = window.util.getRandomNumber(keyValues.length);
@@ -32,9 +32,10 @@
     offer.features = getOfferElements(window.data.FEATURES);
     offer.photos = getOfferElements(window.data.PHOTOS);
     return offer;
-  };
+  };  */
 
   window.util = {
+    BookingList: [],
     getClassWithoutPoint: function (className) {
       return className.slice(1);
     },
@@ -44,7 +45,7 @@
     getRandomCeilNumber: function (max) {
       return Math.ceil(Math.random() * max);
     },
-    mixElements: function (array) {
+    /*  mixElements: function (array) {
       for (var i = array.length - 1, j, temp; i > 0; i--) {
         j = window.util.getRandomNumber(i + 1);
         temp = array[j];
@@ -53,13 +54,13 @@
       }
 
       return array;
-    },
+    },  */
     onEnterPress: function (evt, action) {
       if (evt.keyCode === ENTER_KEYCODE) {
         action();
       }
     },
-    getAvatar: function (index) {
+    /*  getAvatar: function (index) {
       return 'img/avatars/user0' + (index + 1) + '.png';
     },
     getAuthor: function (index) {
@@ -68,7 +69,6 @@
       };
     },
     getBookingList: function () {
-      var BookingList = [];
 
       for (var i = 0; i < window.data.BOOKING_COUNT; i++) {
         BookingList[i] = {};
@@ -78,7 +78,7 @@
       }
 
       return BookingList;
-    },
+    },  */
     hideTextParameter: function (firstOffer, pinCard) {
       var cardFields = ['title', 'text--address', 'text--price', 'type', 'description', 'avatar'];
       var offerTextParameters = [firstOffer.offer.title, firstOffer.offer.address, firstOffer.offer.price, firstOffer.offer.type,
@@ -121,4 +121,10 @@
       }
     }
   };
+
+  var onLoad = function (data) {
+    window.util.BookingList = data;
+  };
+
+  window.backend.load(onLoad, window.error);
 })();
