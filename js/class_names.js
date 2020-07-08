@@ -26,6 +26,8 @@
     adFormDisabled: '.ad-form--disabled',
     mapFilters: '.map__filters',
     mainPin: '.map__pin--main',
-    adFormSubmit: '.ad-form__submit'
+    adFormSubmit: '.ad-form__submit',
+    success: '.success',
+    error: '.error'
   };
 })();

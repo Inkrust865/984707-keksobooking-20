@@ -2,6 +2,7 @@
 
 (function () {
   var urlLoad = 'https://javascript.pages.academy/keksobooking/data';
+  var urlPublish = 'https://javascript.pages.academy/keksobooking';
   var StatusCode = {
     OK: 200
   };
@@ -36,6 +37,9 @@
   window.backend = {
     load: function (onLoad, onError) {
       renderXHR('GET', urlLoad, '', onLoad, onError);
+    },
+    publish: function (data, onLoad, onError) {
+      renderXHR('POST', urlPublish, data, onLoad, onError);
     }
   };
 })();

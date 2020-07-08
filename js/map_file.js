@@ -16,12 +16,6 @@
     getLocationY: function (index) {
       return window.util.BookingList[index].location.y - window.pin.Pin.Y;
     },
-    /*  getLocation: function () {
-      return {
-        x: window.mapFile.getLocationX(),
-        y: window.mapFile.getLocationY()
-      };
-    },  */
     showMap: function () {
       window.mapFile.map.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapFaded));
     },
