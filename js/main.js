@@ -18,13 +18,6 @@
     window.form.renderAddress(window.form.MainPinActive);
   };
 
-  var disablePage = function () {
-    window.form.disableFields(window.form.adForm);
-    window.form.disableFields(window.mapFile.mapFilters);
-
-    window.form.renderAddress(window.form.MainPinDisabled);
-  };
-
   window.main = {
     onMainPinFirstPress: function (evt) {
       if (window.mapFile.map.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mapFaded))) {
@@ -32,6 +25,12 @@
           activatePage(evt);
         }
       }
+    },
+    disablePage: function () {
+      window.form.disableFields(window.form.adForm);
+      window.form.disableFields(window.mapFile.mapFilters);
+
+      window.form.renderAddress(window.form.MainPinDisabled);
     }
   };
 
@@ -41,5 +40,5 @@
     }
   });
 
-  disablePage();
+  window.main.disablePage();
 })();

@@ -36,11 +36,13 @@
     }
   };
 
+  var successMessageTemplate = document.querySelector('#success')
+    .content
+    .querySelector(window.ClassNames.success);
   var inputAddress = window.form.adForm.querySelector('input[name="address"]');
   var roomNumber = document.querySelector('#room_number');
   var capacity = document.querySelector('#capacity');
   var capacityOptions = capacity.querySelectorAll('option');
-  var adFormSubmit = document.querySelector(window.ClassNames.adFormSubmit);
   var roomsAndGuestsRules = [
     {roomNumber: '1', accessibilityCapacityValues: ['1'], validityCapacityValues: ['1'], mustChange: 'Необходимо изменить количество мест', valid: ''},
     {roomNumber: '2', accessibilityCapacityValues: ['1', '2'], validityCapacityValues: ['1', '2']},
@@ -98,8 +100,17 @@
   roomNumber.addEventListener('change', onRoomNumberChange);
   capacity.addEventListener('change', onCapacityChange);
 
-  adFormSubmit.addEventListener('submit', function () {
+  var onLoad = function () {
+    var successMessage = successMessageTemplate.cloneNode(true);
+    document.querySelector('main').appendChild(successMessage);
+  };
+
+  window.form.adForm.addEventListener('submit', function (evt) {
+    window.backend.publish(new FormData(window.form.adForm), onLoad, window.onError);
+
     capacity.removeEventListener('invalid', onCapacityChange);
     roomNumber.removeEventListener('change', onRoomNumberChange);
+
+    evt.preventDefault();
   });
 })();
