@@ -19,6 +19,9 @@
     showMap: function () {
       window.mapFile.map.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapFaded));
     },
+    hideMap: function () {
+      window.mapFile.map.classList.add(window.util.getClassWithoutPoint(window.ClassNames.mapFaded));
+    },
     renderFragment: function () {
       var fragment = document.createDocumentFragment();
       for (var i = 0; i < window.util.BookingList.length - 1; i++) {
