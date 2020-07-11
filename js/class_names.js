@@ -27,7 +27,9 @@
     mapFilters: '.map__filters',
     mainPin: '.map__pin--main',
     adFormSubmit: '.ad-form__submit',
+    resetButton: '.ad-form__reset',
     success: '.success',
-    error: '.error'
+    error: '.error',
+    errorButton: '.error__button'
   };
 })();

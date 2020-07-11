@@ -1,12 +1,12 @@
 'use strict';
 
 (function () {
-  window.onError = function () {
-    var errorMessageTemplate = document.querySelector('#error')
-      .content
-      .querySelector(window.ClassNames.error);
-    var errorMessage = errorMessageTemplate.cloneNode(true);
+  window.error = {
+    onError: function () {
+      window.formMessage.renderErrorMessage();
 
-    document.body.insertAdjacentElement('afterbegin', errorMessage);
+      document.addEventListener('keydown', window.formMessage.onErrorMessageEscPress);
+      document.addEventListener('click', window.formMessage.onErrorMessageMousePress);
+    }
   };
 })();

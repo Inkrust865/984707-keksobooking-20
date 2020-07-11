@@ -2,9 +2,6 @@
 
 (function () {
   var mapPins = document.querySelector(window.ClassNames.mapPins);
-  var MouseButtons = {
-    left: 0
-  };
 
   var activatePage = function () {
     window.mapFile.showMap();
@@ -19,14 +16,20 @@
   };
 
   window.main = {
+    MouseButtons: {
+      left: 0
+    },
     onMainPinFirstPress: function (evt) {
       if (window.mapFile.map.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mapFaded))) {
-        if (evt.button === MouseButtons.left) {
+        if (evt.button === window.main.MouseButtons.left) {
           activatePage(evt);
         }
       }
     },
     disablePage: function () {
+      window.mapFile.hideMap();
+
+      window.form.adForm.classList.add(window.util.getClassWithoutPoint(window.ClassNames.adFormDisabled));
       window.form.disableFields(window.form.adForm);
       window.form.disableFields(window.mapFile.mapFilters);
 
