@@ -39,7 +39,12 @@
 
   var mapPins = document.querySelector(window.ClassNames.mapPins);
   var selectList = window.form.adForm.querySelectorAll('select');
+  var selectType = window.form.adForm.querySelector('select[name="type"]');
+  var selectTimein = window.form.adForm.querySelector('select[name="timein"]');
+  var selectTimeout = window.form.adForm.querySelector('select[name="timeout"]');
   var inputAddress = window.form.adForm.querySelector('input[name="address"]');
+  var inputTitle = window.form.adForm.querySelector('input[name="title"]');
+  var inputPrice = window.form.adForm.querySelector('input[name="price"]');
   var roomNumber = document.querySelector('#room_number');
   var capacity = document.querySelector('#capacity');
   var capacityOptions = capacity.querySelectorAll('option');
@@ -49,6 +54,65 @@
     {roomNumber: '3', capacityValues: ['1', '2', '3']},
     {roomNumber: '100', capacityValues: ['0']}
   ];
+
+  var inputTitleInvalid = function () {
+    if (inputTitle.validity.tooShort) {
+      inputTitle.setCustomValidity('Заголовок должен состоять минимум из 30 символов!');
+    } else if (inputTitle.validity.tooLong) {
+      inputTitle.setCustomValidity('Заголовок не должен превышать 100 символов!');
+    } else if (inputTitle.validity.valueMissing) {
+      inputTitle.setCustomValidity('Обязательное поле!');
+    } else {
+      inputTitle.setCustomValidity('');
+    }
+  };
+
+  inputTitle.addEventListener('invalid', inputTitleInvalid);
+
+  var inputTitleInput = function () {
+    var valueLength = inputTitle.value.length;
+    var minLength = inputTitle.minLength;
+    var maxLength = inputTitle.maxLength;
+
+    if (valueLength < minLength) {
+      inputTitle.setCustomValidity('Еще ' + (minLength - valueLength) + ' символов');
+    } else if (valueLength > maxLength) {
+      inputTitle.setCustomValidity('Удалите лишние ' + (valueLength - maxLength) + ' символов');
+    } else {
+      inputTitle.setCustomValidity('');
+    }
+  };
+
+  inputTitle.addEventListener('input', inputTitleInput);
+
+  var selectTypeChange = function () {
+    var compliancesTypeMinPrice = [
+      {type: 'bungalo', minPrice: '0'},
+      {type: 'flat', minPrice: '1000'},
+      {type: 'house', minPrice: '5000'},
+      {type: 'palace', minPrice: '10000'}
+    ];
+
+    compliancesTypeMinPrice.forEach(function (compliance) {
+      if (selectType.value === compliance.type) {
+        inputPrice.min = compliance.minPrice;
+      }
+    });
+  };
+
+  selectType.addEventListener('change', selectTypeChange);
+
+  var selectTimeinChange = function () {
+    selectTimeout.value = selectTimein.value;
+  };
+
+  selectTimein.addEventListener('change', selectTimeinChange);
+
+  var selectTimeoutChange = function () {
+    selectTimein.value = selectTimeout.value;
+  };
+
+  selectTimeout.addEventListener('change', selectTimeoutChange);
 
   var renderInitialStateCapacity = function () {
     capacityOptions.forEach(function (option) {
@@ -140,6 +204,11 @@
 
     capacity.removeEventListener('invalid', onCapacityChange);
     roomNumber.removeEventListener('change', onRoomNumberChange);
+    inputTitle.removeEventListener('invalid', inputTitleInvalid);
+    inputTitle.removeEventListener('input', inputTitleInput);
+    selectType.removeEventListener('change', selectTypeChange);
+    selectTimein.addEventListener('change', selectTimeinChange);
+    selectTimeout.addEventListener('change', selectTimeoutChange);
   };
 
   window.form.adForm.addEventListener('submit', function (evt) {

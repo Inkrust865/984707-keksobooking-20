@@ -14,6 +14,7 @@
     popupTime: '.popup__text--time',
     popupDescription: '.popup__description',
     popupAvatar: '.popup__avatar',
+    popupClose: '.popup__close',
     filtersContainer: '.map__filters-container',
     mapOverlay: '.map__overlay',
     mapPins: '.map__pins',
