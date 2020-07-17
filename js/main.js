@@ -7,6 +7,7 @@
     MouseButtons: {
       left: 0
     },
+    mapPinList: [],
     onMainPinFirstPress: function (evt) {
       if (window.mapFile.map.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mapFaded))) {
         if (evt.button === window.main.MouseButtons.left) {
@@ -29,10 +30,10 @@
     window.mapFile.showMap();
 
     mapPins.appendChild(window.mapFile.renderFragment());
-    var mapPinList = mapPins.querySelectorAll(window.ClassNames.mapPin);
+    window.main.mapPinList = mapPins.querySelectorAll(window.ClassNames.mapPin);
     window.main.mapPin = mapPins.querySelector(window.ClassNames.mapPin);
 
-    Array.from(mapPinList).forEach(function (mapPin, index) {
+    Array.from(window.main.mapPinList).forEach(function (mapPin, index) {
       var showCard = function () {
         window.card.openCard(index);
       };
@@ -45,7 +46,9 @@
 
       if (!mapPin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
         mapPin.addEventListener('click', showCard);
-        mapPin.addEventListener('keydown', onCardEnterPress);
+        if (document.querySelectorAll(window.ClassNames.mapCard).length < 1) {
+          mapPin.addEventListener('keydown', onCardEnterPress);
+        }
       }
     });
 

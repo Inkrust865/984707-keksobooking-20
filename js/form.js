@@ -26,6 +26,7 @@
         });
 
       renderInitialStateCapacity();
+      renderMinPriceType();
     },
     renderAddress: function (typeMainPin) {
       var top = Math.floor(parseInt(window.form.mapPinMain.style.top, 10));
@@ -85,7 +86,7 @@
 
   inputTitle.addEventListener('input', inputTitleInput);
 
-  var selectTypeChange = function () {
+  var renderMinPriceType = function () {
     var compliancesTypeMinPrice = [
       {type: 'bungalo', minPrice: '0'},
       {type: 'flat', minPrice: '1000'},
@@ -98,6 +99,11 @@
         inputPrice.min = compliance.minPrice;
       }
     });
+  };
+
+  var selectTypeChange = function () {
+    renderMinPriceType();
+    selectType.removeEventListener('change', selectTypeChange);
   };
 
   selectType.addEventListener('change', selectTypeChange);
@@ -122,12 +128,11 @@
     });
   };
 
-  function getCurrentRule(rules) {
+  var getCurrentRule = function (rules) {
     return rules.find(function (ruleRoom) {
       return ruleRoom.roomNumber === roomNumber.value;
     }) || {roomNumber: '', capacityValues: []};
-  }
-
+  };
 
   var setValidityRule = function () {
     if (getCurrentRule(roomsAndGuestsRules).capacityValues.includes(capacity.value)) {
@@ -195,25 +200,31 @@
 
     window.main.disablePage();
     cleanFields();
-    window.util.BookingList.forEach(function () {
-      mapPins.removeChild(mapPins.lastChild);
+
+    Array.from(window.main.mapPinList).forEach(function (pin) {
+      if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
+        mapPins.removeChild(pin);
+      }
     });
 
     var card = window.mapFile.map.querySelector(window.ClassNames.mapCard);
-    card.classList.add(window.util.getClassWithoutPoint(window.ClassNames.hidden));
+    if (!card) {
+      return;
+    } else {
+      window.mapFile.map.removeChild(card);
+    }
 
     capacity.removeEventListener('invalid', onCapacityChange);
     roomNumber.removeEventListener('change', onRoomNumberChange);
     inputTitle.removeEventListener('invalid', inputTitleInvalid);
     inputTitle.removeEventListener('input', inputTitleInput);
-    selectType.removeEventListener('change', selectTypeChange);
     selectTimein.addEventListener('change', selectTimeinChange);
     selectTimeout.addEventListener('change', selectTimeoutChange);
   };
 
   window.form.adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    window.backend.publish(new FormData(window.form.adForm), onPublish, window.error.onError);
+    window.backend.publish(new FormData(window.form.adForm), onPublish, window.error.onErrorPost);
 
     window.form.resetButton.removeEventListener('click', cleanFields);
     document.removeEventListener('keydown', window.formMessage.onSuccessMessageEscPress);

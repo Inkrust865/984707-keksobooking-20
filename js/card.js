@@ -37,23 +37,19 @@
         var onCardClosePress = function () {
           closeCard();
           cardClose.removeEventListener('click', onCardClosePress);
-          document.removeEventListener('keydown', onCardEscPress);
+          document.removeEventListener('keydown', closeCardEscPress);
         };
 
         var closeCardEscPress = function (evt) {
           window.util.onEscPress(evt, function () {
             closeCard();
             cardClose.removeEventListener('click', onCardClosePress);
-            document.removeEventListener('keydown', onCardEscPress);
+            document.removeEventListener('keydown', closeCardEscPress);
           });
         };
 
-        var onCardEscPress = function () {
-          document.addEventListener('keydown', closeCardEscPress);
-        };
-
         cardClose.addEventListener('click', onCardClosePress);
-        onCardEscPress();
+        document.addEventListener('keydown', closeCardEscPress);
       }
     }
   };
