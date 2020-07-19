@@ -73,5 +73,5 @@
     window.util.BookingList = data;
   };
 
-  window.backend.load(onLoad, window.error);
+  window.backend.load(onLoad, window.error.onErrorGet);
 })();

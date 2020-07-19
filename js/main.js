@@ -3,22 +3,11 @@
 (function () {
   var mapPins = document.querySelector(window.ClassNames.mapPins);
 
-  var activatePage = function () {
-    window.mapFile.showMap();
-    mapPins.appendChild(window.mapFile.renderFragment());
-    window.mapFile.map.insertBefore(window.card.renderCard(), window.mapFile.map.querySelector(window.ClassNames.filtersContainer));
-
-    window.form.adForm.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.adFormDisabled));
-    window.form.activateFields(window.form.adForm);
-    window.form.activateFields(window.mapFile.mapFilters);
-
-    window.form.renderAddress(window.form.MainPinActive);
-  };
-
   window.main = {
     MouseButtons: {
       left: 0
     },
+    mapPinList: [],
     onMainPinFirstPress: function (evt) {
       if (window.mapFile.map.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mapFaded))) {
         if (evt.button === window.main.MouseButtons.left) {
@@ -35,6 +24,39 @@
 
       window.form.renderAddress(window.form.MainPinDisabled);
     }
+  };
+
+  var activatePage = function () {
+    window.mapFile.showMap();
+
+    mapPins.appendChild(window.mapFile.renderFragment());
+    window.main.mapPinList = mapPins.querySelectorAll(window.ClassNames.mapPin);
+    window.main.mapPin = mapPins.querySelector(window.ClassNames.mapPin);
+
+    Array.from(window.main.mapPinList).forEach(function (mapPin, index) {
+      var showCard = function () {
+        window.card.openCard(index);
+      };
+
+      var onCardEnterPress = function (evt) {
+        window.util.onEnterPress(evt, function () {
+          showCard();
+        });
+      };
+
+      if (!mapPin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
+        mapPin.addEventListener('click', showCard);
+        if (document.querySelectorAll(window.ClassNames.mapCard).length < 1) {
+          mapPin.addEventListener('keydown', onCardEnterPress);
+        }
+      }
+    });
+
+    window.form.adForm.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.adFormDisabled));
+    window.form.activateFields(window.form.adForm);
+    window.form.activateFields(window.mapFile.mapFilters);
+
+    window.form.renderAddress(window.form.MainPinActive);
   };
 
   window.form.mapPinMain.addEventListener('keydown', function (evt) {
