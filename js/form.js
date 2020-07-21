@@ -35,10 +35,19 @@
       var mainPinY = top + typeMainPin.Y;
 
       inputAddress.value = mainPinX + ', ' + mainPinY;
+    },
+    hideCard: function () {
+      var card = window.mapFile.map.querySelector(window.ClassNames.mapCard);
+      if (!card) {
+        return;
+      } else {
+        window.mapFile.map.removeChild(card);
+        window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
+        document.removeEventListener('keydown', window.card.closeCardEscPress);
+      }
     }
   };
 
-  var mapPins = document.querySelector(window.ClassNames.mapPins);
   var selectList = window.form.adForm.querySelectorAll('select');
   var selectType = window.form.adForm.querySelector('select[name="type"]');
   var selectTimein = window.form.adForm.querySelector('select[name="timein"]');
@@ -203,16 +212,11 @@
 
     Array.from(window.main.mapPinList).forEach(function (pin) {
       if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
-        mapPins.removeChild(pin);
+        window.updatePinsList.mapPins.removeChild(pin);
       }
     });
 
-    var card = window.mapFile.map.querySelector(window.ClassNames.mapCard);
-    if (!card) {
-      return;
-    } else {
-      window.mapFile.map.removeChild(card);
-    }
+    window.form.hideCard();
 
     capacity.removeEventListener('invalid', onCapacityChange);
     roomNumber.removeEventListener('change', onRoomNumberChange);

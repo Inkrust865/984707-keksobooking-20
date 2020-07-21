@@ -14,7 +14,7 @@
       var bookingPin = mapPinTemplate.cloneNode(true);
       var pinImg = bookingPin.querySelector('img');
 
-      pinImg.src = window.util.BookingList[index].author.avatar;
+      pinImg.src = window.updatePinsList.pinsList[index].author.avatar;
       pinImg.alt = 'Заголовок объявления';
       bookingPin.style.left = window.mapFile.getLocationX(index) + 'px';
       bookingPin.style.top = window.mapFile.getLocationY(index) + 'px';

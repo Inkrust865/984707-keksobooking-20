@@ -68,10 +68,4 @@
       }
     }
   };
-
-  var onLoad = function (data) {
-    window.util.BookingList = data;
-  };
-
-  window.backend.load(onLoad, window.error.onErrorGet);
 })();

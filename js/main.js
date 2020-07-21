@@ -1,8 +1,6 @@
 'use strict';
 
 (function () {
-  var mapPins = document.querySelector(window.ClassNames.mapPins);
-
   window.main = {
     MouseButtons: {
       left: 0
@@ -29,26 +27,9 @@
   var activatePage = function () {
     window.mapFile.showMap();
 
-    mapPins.appendChild(window.mapFile.renderFragment());
-    window.main.mapPinList = mapPins.querySelectorAll(window.ClassNames.mapPin);
-    window.main.mapPin = mapPins.querySelector(window.ClassNames.mapPin);
-
-    Array.from(window.main.mapPinList).forEach(function (mapPin, index) {
-      var showCard = function () {
-        window.card.openCard(index);
-      };
-
-      var onCardEnterPress = function (evt) {
-        window.util.onEnterPress(evt, function () {
-          showCard();
-        });
-      };
-
-      if (!mapPin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
-        mapPin.addEventListener('click', showCard);
-        if (document.querySelectorAll(window.ClassNames.mapCard).length < 1) {
-          mapPin.addEventListener('keydown', onCardEnterPress);
-        }
+    Array.from(window.updatePinsList.mapPinList).forEach(function (pin) {
+      if (pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.hidden))) {
+        pin.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.hidden));
       }
     });
 
