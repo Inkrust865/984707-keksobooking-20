@@ -11,10 +11,10 @@
     mapFilters: document.querySelector(window.ClassNames.mapFilters),
     mapHeight: MapCity.MAX_Y - MapCity.MIN_Y,
     getLocationX: function (index) {
-      return window.util.BookingList[index].location.x - window.pin.Pin.X;
+      return window.updatePinsList.pinsList[index].location.x - window.pin.Pin.X;
     },
     getLocationY: function (index) {
-      return window.util.BookingList[index].location.y - window.pin.Pin.Y;
+      return window.updatePinsList.pinsList[index].location.y - window.pin.Pin.Y;
     },
     showMap: function () {
       window.mapFile.map.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapFaded));
@@ -22,9 +22,12 @@
     hideMap: function () {
       window.mapFile.map.classList.add(window.util.getClassWithoutPoint(window.ClassNames.mapFaded));
     },
-    renderFragment: function () {
+    renderFragment: function (data) {
       var fragment = document.createDocumentFragment();
-      for (var i = 0; i < window.util.BookingList.length - 1; i++) {
+      var takeNumber = data.length > window.data.MAX_BOOKING_COUNT ? window.data.MAX_BOOKING_COUNT : data.length;
+      fragment.innerHTML = '';
+
+      for (var i = 0; i < takeNumber; i++) {
         fragment.appendChild(window.pin.renderBookingPin(i));
       }
 

@@ -4,7 +4,7 @@
   window.card = {
     renderCard: function (index) {
       var pinCard = mapCardTemplate.cloneNode(true);
-      var chosenOffer = window.util.BookingList[index - 1];
+      var chosenOffer = window.updatePinsList.pinsList[index - 1];
 
       pinCard.querySelector(window.ClassNames.popupTitle).textContent = chosenOffer.offer.title;
       pinCard.querySelector(window.ClassNames.popupAddress).textContent = chosenOffer.offer.address;
@@ -28,28 +28,28 @@
         window.mapFile.map.insertBefore(window.card.renderCard(index), window.mapFile.map.querySelector(window.ClassNames.filtersContainer));
 
         var mapCard = document.querySelector(window.ClassNames.mapCard);
-        var cardClose = document.querySelector(window.ClassNames.popupClose);
+        window.card.cardClose = document.querySelector(window.ClassNames.popupClose);
 
         var closeCard = function () {
           window.mapFile.map.removeChild(mapCard);
         };
 
-        var onCardClosePress = function () {
+        window.card.onCardClosePress = function () {
           closeCard();
-          cardClose.removeEventListener('click', onCardClosePress);
-          document.removeEventListener('keydown', closeCardEscPress);
+          window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
+          document.removeEventListener('keydown', window.card.closeCardEscPress);
         };
 
-        var closeCardEscPress = function (evt) {
+        window.card.closeCardEscPress = function (evt) {
           window.util.onEscPress(evt, function () {
             closeCard();
-            cardClose.removeEventListener('click', onCardClosePress);
-            document.removeEventListener('keydown', closeCardEscPress);
+            window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
+            document.removeEventListener('keydown', window.card.closeCardEscPress);
           });
         };
 
-        cardClose.addEventListener('click', onCardClosePress);
-        document.addEventListener('keydown', closeCardEscPress);
+        window.card.cardClose.addEventListener('click', window.card.onCardClosePress);
+        document.addEventListener('keydown', window.card.closeCardEscPress);
       }
     }
   };

@@ -2,7 +2,7 @@
 
 (function () {
   window.data = {
-    BOOKING_COUNT: 8,
+    MAX_BOOKING_COUNT: 5,
     TYPES: ['palace', 'flat', 'house', 'bungalo'],
     RUSSIAN_TYPES: ['Дворец', 'Квартира', 'Дом', 'Бунгало'],
     TITLES: ['Квартира с камином', 'Дом с садом', 'Дом, можно с питомцами', 'Уютная квартира в центре Токио', 'Дом с парковкой'],
