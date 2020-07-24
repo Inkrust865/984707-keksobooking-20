@@ -19,6 +19,7 @@
     mapOverlay: '.map__overlay',
     mapPins: '.map__pins',
     mapPin: '.map__pin',
+    mapPinActive: '.map__pin--active',
     mapCard: '.map__card',
     map: '.map',
     mapFaded: '.map--faded',

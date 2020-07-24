@@ -1,98 +1,91 @@
 'use strict';
 
 (function () {
-  var pinType = 'any';
-  var pinPrice = 'any';
-  var pinRooms = 'any';
-  var pinGuests = 'any';
-
-  var getRank = function (pin) {
-    var rank = 0;
-
-    if (pin.offer.type === pinType) {
-      rank += 10;
-    }
-    if (pin.offer.rooms === parseInt(pinRooms, 10)) {
-      rank += 9;
-    }
-    if ((pin.offer.price >= 10000 && pin.offer.price <= 50000 && pinPrice === 'middle') ||
-    (pin.offer.price < 10000 && pinPrice === 'low') || (pin.offer.price > 50000 && pinPrice === 'high')) {
-      rank += 8;
-    }
-    if (pin.offer.guests === parseInt(pinGuests, 10)) {
-      rank += 7;
-    }
+  var includeFeature = function (pin, featureName, inputChecked) {
+    var included = false;
     pin.offer.features.forEach(function (feature) {
-      if (feature === 'wifi' && window.filter.checkboxWifi.checked === true) {
-        rank += 6;
+      if (feature === featureName && (inputChecked === true)) {
+        included = true;
       }
     });
-    pin.offer.features.forEach(function (feature) {
-      if (feature === 'dishwasher' && window.filter.checkboxDishwasher.checked === true) {
-        rank += 5;
-      }
-    });
-    pin.offer.features.forEach(function (feature) {
-      if (feature === 'parking' && window.filter.checkboxParking.checked === true) {
-        rank += 4;
-      }
-    });
-    pin.offer.features.forEach(function (feature) {
-      if (feature === 'washer' && window.filter.checkboxWasher.checked === true) {
-        rank += 3;
-      }
-    });
-    pin.offer.features.forEach(function (feature) {
-      if (feature === 'elevator' && window.filter.checkboxElevator.checked === true) {
-        rank += 2;
-      }
-    });
-    pin.offer.features.forEach(function (feature) {
-      if (feature === 'conditioner' && window.filter.checkboxConditioner.checked === true) {
-        rank += 1;
-      }
-    });
-
-    return rank;
-  };
-
-  var titlesComparator = function (left, right) {
-    if (left > right) {
-      return 1;
-    } else if (left < right) {
-      return -1;
-    } else {
-      return 0;
-    }
+    return included;
   };
 
   window.updatePinsList = {
+    pinType: 'any',
+    pinPrice: 'any',
+    pinRooms: 'any',
+    pinGuests: 'any',
     pinsList: [],
     mapPins: document.querySelector(window.ClassNames.mapPins),
-    updateBookingPins: function () {
-      var newPinsFragment = window.mapFile.renderFragment(window.updatePinsList.pinsList.sort(function (left, right) {
-        var rankDiff = getRank(right) - getRank(left);
-
-        if (rankDiff === 0) {
-          rankDiff = titlesComparator(left.offer.title, right.offer.title);
+    swapPinActive: function (pinList) {
+      pinList.forEach(function (pin) {
+        if (document.activeElement === pin) {
+          pin.classList.add(window.util.getClassWithoutPoint(window.ClassNames.mapPinActive));
+        } else {
+          pin.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapPinActive));
         }
+      });
+    },
+    updateBookingPins: function () {
+      window.updatePinsList.newPinsList = window.updatePinsList.pinsList
+        .filter(function (pin) {
+          return (pin.offer.type === window.updatePinsList.pinType) || (window.updatePinsList.pinType === 'any');
+        })
+        .filter(function (pin) {
+          return (pin.offer.price >= 10000 && pin.offer.price <= 50000 && window.updatePinsList.pinPrice === 'middle') ||
+          (pin.offer.price < 10000 && window.updatePinsList.pinPrice === 'low') ||
+          (pin.offer.price > 50000 && window.updatePinsList.pinPrice === 'high') || (window.updatePinsList.pinPrice === 'any');
+        })
+        .filter(function (pin) {
+          return (pin.offer.rooms === parseInt(window.updatePinsList.pinRooms, 10)) || (window.updatePinsList.pinRooms === 'any');
+        })
+        .filter(function (pin) {
+          return (pin.offer.guests === parseInt(window.updatePinsList.pinGuests, 10)) || (window.updatePinsList.pinGuests === 'any');
+        })
+        .filter(function (pin) {
+          return (includeFeature(pin, 'wifi', window.filter.checkboxWifi.checked) === true) || (window.filter.checkboxWifi.checked === false);
+        })
+        .filter(function (pin) {
+          return (includeFeature(pin, 'dishwasher', window.filter.checkboxDishwasher.checked) === true) ||
+          (window.filter.checkboxDishwasher.checked === false);
+        })
+        .filter(function (pin) {
+          return (includeFeature(pin, 'parking', window.filter.checkboxParking.checked) === true) ||
+          (window.filter.checkboxParking.checked === false);
+        })
+        .filter(function (pin) {
+          return (includeFeature(pin, 'washer', window.filter.checkboxWasher.checked) === true) ||
+          (window.filter.checkboxWasher.checked === false);
+        })
+        .filter(function (pin) {
+          return (includeFeature(pin, 'elevator', window.filter.checkboxElevator.checked) === true) ||
+          (window.filter.checkboxElevator.checked === false);
+        })
+        .filter(function (pin) {
+          return (includeFeature(pin, 'conditioner', window.filter.checkboxConditioner.checked) === true) ||
+          (window.filter.checkboxConditioner.checked === false);
+        });
 
-        return rankDiff;
-      }));
+      var newPinsFragment = window.mapFile.renderFragment(window.updatePinsList.newPinsList);
 
       window.updatePinsList.mapPins.appendChild(newPinsFragment);
 
       window.updatePinsList.mapPinList = window.updatePinsList.mapPins.querySelectorAll(window.ClassNames.mapPin);
       window.updatePinsList.mapPin = window.updatePinsList.mapPins.querySelector(window.ClassNames.mapPin);
 
-      Array.from(window.updatePinsList.mapPinList).forEach(function (mapPin, index) {
+      Array.from(window.updatePinsList.mapPinList).forEach(function (mapPin, index, pinList) {
         window.updatePinsList.showCard = function () {
+          window.updatePinsList.swapPinActive(pinList);
+
           window.card.openCard(index);
         };
 
         window.updatePinsList.onCardEnterPress = function (evt) {
           window.util.onEnterPress(evt, function () {
-            window.updatePinsList.showCard();
+            window.updatePinsList.showCard = function () {
+              window.card.openCard(index);
+            };
           });
         };
 
@@ -103,7 +96,7 @@
 
           mapPin.addEventListener('click', window.updatePinsList.showCard);
 
-          if (document.querySelectorAll(window.ClassNames.mapCard).length < 1) {
+          if (!document.querySelector(window.ClassNames.mapCard)) {
             mapPin.addEventListener('keydown', window.updatePinsList.onCardEnterPress);
           }
         }
@@ -112,53 +105,30 @@
   };
 
   window.filter.bookingPin.onTypeChange = window.debounce(function (type) {
-    pinType = type;
+    window.updatePinsList.pinType = type;
     window.updatePinsList.updateBookingPins();
   });
 
   window.filter.bookingPin.onPriceChange = window.debounce(function (price) {
-    pinPrice = price;
+    window.updatePinsList.pinPrice = price;
     window.updatePinsList.updateBookingPins();
   });
 
   window.filter.bookingPin.onRoomsChange = window.debounce(function (rooms) {
-    pinRooms = rooms;
+    window.updatePinsList.pinRooms = rooms;
     window.updatePinsList.updateBookingPins();
   });
 
   window.filter.bookingPin.onGuestsChange = window.debounce(function (guests) {
-    pinGuests = guests;
+    window.updatePinsList.pinGuests = guests;
     window.updatePinsList.updateBookingPins();
   });
 
-  window.filter.bookingPin.onWifiChange = window.debounce(function () {
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onDishwasherChange = window.debounce(function () {
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onParkingChange = window.debounce(function () {
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onWasherChange = window.debounce(function () {
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onElevatorChange = window.debounce(function () {
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onConditionerChange = window.debounce(function () {
-    window.updatePinsList.updateBookingPins();
-  });
-
-  var onLoad = function (data) {
+  window.updatePinsList.onLoad = function (data) {
     window.updatePinsList.pinsList = data;
     window.updatePinsList.updateBookingPins();
+    window.form.activateFields(window.mapFile.mapFilters);
   };
 
-  window.backend.load(onLoad, window.error.onErrorGet);
+  window.backend.load(window.updatePinsList.onLoad, window.error.onErrorGet);
 })();

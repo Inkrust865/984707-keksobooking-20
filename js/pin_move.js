@@ -14,6 +14,11 @@
     window.main.onMainPinFirstPress(evt);
     evt.preventDefault();
 
+    Array.from(window.updatePinsList.mapPinList).forEach(function (pin) {
+      pin.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapPinActive));
+      window.form.mapPinMain.classList.add(window.util.getClassWithoutPoint(window.ClassNames.mapPinActive));
+    });
+
     var startCoords = {
       x: evt.clientX,
       y: evt.clientY

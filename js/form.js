@@ -106,13 +106,13 @@
     compliancesTypeMinPrice.forEach(function (compliance) {
       if (selectType.value === compliance.type) {
         inputPrice.min = compliance.minPrice;
+        inputPrice.placeholder = compliance.minPrice;
       }
     });
   };
 
   var selectTypeChange = function () {
     renderMinPriceType();
-    selectType.removeEventListener('change', selectTypeChange);
   };
 
   selectType.addEventListener('change', selectTypeChange);
@@ -186,9 +186,32 @@
     });
   };
 
+  var cleanAvatarImg = function () {
+    var avatarPreviewBlock = document.querySelector('.ad-form-header__preview');
+
+    if (window.chooseImages.avatarPreview) {
+      avatarPreviewBlock.removeChild(window.chooseImages.avatarPreview);
+      var newAvatarPreview = document.createElement('img');
+      newAvatarPreview.src = 'img/muffin-grey.svg';
+      newAvatarPreview.alt = 'Аватар пользователя';
+      newAvatarPreview.width = '40';
+      newAvatarPreview.height = '44';
+      avatarPreviewBlock.appendChild(newAvatarPreview);
+    }
+  };
+
+  var cleanImgChooser = function () {
+    cleanAvatarImg();
+
+    if (window.chooseImages.housingPreview) {
+      window.chooseImages.housingPreviewBlock.removeChild(window.chooseImages.housingPreview);
+    }
+  };
+
   var cleanFields = function () {
     window.form.adForm.reset();
     cleanSelect();
+    cleanImgChooser();
 
     window.form.renderAddress(window.form.MainPinActive);
   };
@@ -196,7 +219,9 @@
   var onResetButton = function (evt) {
     evt.preventDefault();
 
+    window.main.disablePage();
     cleanFields();
+    window.form.hideCard();
   };
 
   window.form.resetButton.addEventListener('click', onResetButton);
@@ -209,6 +234,7 @@
 
     window.main.disablePage();
     cleanFields();
+    window.form.hideCard();
 
     Array.from(window.main.mapPinList).forEach(function (pin) {
       if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
@@ -216,12 +242,11 @@
       }
     });
 
-    window.form.hideCard();
-
     capacity.removeEventListener('invalid', onCapacityChange);
     roomNumber.removeEventListener('change', onRoomNumberChange);
     inputTitle.removeEventListener('invalid', inputTitleInvalid);
     inputTitle.removeEventListener('input', inputTitleInput);
+    selectType.removeEventListener('change', selectTypeChange);
     selectTimein.addEventListener('change', selectTimeinChange);
     selectTimeout.addEventListener('change', selectTimeoutChange);
   };

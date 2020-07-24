@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var filterForm = document.querySelector('.map__filters');
   var bookingPin = {
     onTypeChange: function (type) {
       return type;
@@ -13,27 +14,8 @@
     },
     onGuestsChange: function (guests) {
       return guests;
-    },
-    onWifiChange: function () {
-      return;
-    },
-    onDishwasherChange: function () {
-      return;
-    },
-    onParkingChange: function () {
-      return;
-    },
-    onWasherChange: function () {
-      return;
-    },
-    onElevatorChange: function () {
-      return;
-    },
-    onConditionerChange: function () {
-      return;
     }
   };
-
 
   var nullifyFilter = function () {
     window.updatePinsList.mapPins = document.querySelector(window.ClassNames.mapPins);
@@ -75,29 +57,18 @@
       nullifyFilter();
       bookingPin.onGuestsChange(window.filter.selectPinGuests.value);
     },
-    setupPinWifiClick: function () {
+    setupFilterCheckboxClick: window.debounce(function () {
       nullifyFilter();
-      bookingPin.onWifiChange();
-    },
-    setupPinDishwasherClick: function () {
+      window.updatePinsList.updateBookingPins();
+    }),
+    resetFilter: function () {
+      filterForm.reset();
       nullifyFilter();
-      bookingPin.onDishwasherChange();
-    },
-    setupPinParkingClick: function () {
-      nullifyFilter();
-      bookingPin.onParkingChange();
-    },
-    setupPinWasherClick: function () {
-      nullifyFilter();
-      bookingPin.onWasherChange();
-    },
-    setupPinElevatorClick: function () {
-      nullifyFilter();
-      bookingPin.onElevatorChange();
-    },
-    setupPinConditionerClick: function () {
-      nullifyFilter();
-      bookingPin.onConditionerChange();
+      window.updatePinsList.pinType = 'any';
+      window.updatePinsList.pinPrice = 'any';
+      window.updatePinsList.pinRooms = 'any';
+      window.updatePinsList.pinGuests = 'any';
+      window.updatePinsList.updateBookingPins();
     }
   };
 
@@ -105,12 +76,12 @@
   window.filter.selectPinPrice.addEventListener('change', window.filter.setupPinPriceClick);
   window.filter.selectPinRooms.addEventListener('change', window.filter.setupPinRoomsClick);
   window.filter.selectPinGuests.addEventListener('change', window.filter.setupPinGuestsClick);
-  window.filter.checkboxWifi.addEventListener('change', window.filter.setupPinWifiClick);
-  window.filter.checkboxDishwasher.addEventListener('change', window.filter.setupPinDishwasherClick);
-  window.filter.checkboxParking.addEventListener('change', window.filter.setupPinParkingClick);
-  window.filter.checkboxWasher.addEventListener('change', window.filter.setupPinWasherClick);
-  window.filter.checkboxElevator.addEventListener('change', window.filter.setupPinElevatorClick);
-  window.filter.checkboxConditioner.addEventListener('change', window.filter.setupPinConditionerClick);
+  window.filter.checkboxWifi.addEventListener('change', window.filter.setupFilterCheckboxClick);
+  window.filter.checkboxDishwasher.addEventListener('change', window.filter.setupFilterCheckboxClick);
+  window.filter.checkboxParking.addEventListener('change', window.filter.setupFilterCheckboxClick);
+  window.filter.checkboxWasher.addEventListener('change', window.filter.setupFilterCheckboxClick);
+  window.filter.checkboxElevator.addEventListener('change', window.filter.setupFilterCheckboxClick);
+  window.filter.checkboxConditioner.addEventListener('change', window.filter.setupFilterCheckboxClick);
 
   window.filter.bookingPin = bookingPin;
   return window.filter.bookingPin;
