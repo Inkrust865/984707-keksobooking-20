@@ -1,23 +1,30 @@
 'use strict';
 
 (function () {
-  var includeFeature = function (pin, featureName, inputChecked) {
-    var included = false;
-    pin.offer.features.forEach(function (feature) {
-      if (feature === featureName && (inputChecked === true)) {
-        included = true;
-      }
+  var includeFeature = function (pin, featureName) {
+    return pin.offer.features.some(function (feature) {
+      return feature === featureName;
     });
-    return included;
   };
 
   window.updatePinsList = {
-    pinType: 'any',
-    pinPrice: 'any',
-    pinRooms: 'any',
-    pinGuests: 'any',
-    pinsList: [],
     mapPins: document.querySelector(window.ClassNames.mapPins),
+    checkForFeatures: function (pin) {
+      var activateCheckboxes = Object.keys(window.filter.checkboxFilterList);
+
+      return activateCheckboxes.every(function (filter) {
+        return window.filter.checkboxFilterList[filter]
+          ? includeFeature(pin, filter)
+          : true;
+      });
+    },
+    filterCheck: function (filterStatus, pin, filterType, cb) {
+      if (filterStatus !== 'any') {
+        return cb(pin, filterType, filterStatus);
+      }
+
+      return true;
+    },
     swapPinActive: function (pinList) {
       pinList.forEach(function (pin) {
         if (document.activeElement === pin) {
@@ -27,44 +34,19 @@
         }
       });
     },
-    updateBookingPins: function () {
+    updateBookingPins: window.debounce(function () {
       window.updatePinsList.newPinsList = window.updatePinsList.pinsList
         .filter(function (pin) {
-          return (pin.offer.type === window.updatePinsList.pinType) || (window.updatePinsList.pinType === 'any');
-        })
-        .filter(function (pin) {
-          return (pin.offer.price >= 10000 && pin.offer.price <= 50000 && window.updatePinsList.pinPrice === 'middle') ||
-          (pin.offer.price < 10000 && window.updatePinsList.pinPrice === 'low') ||
-          (pin.offer.price > 50000 && window.updatePinsList.pinPrice === 'high') || (window.updatePinsList.pinPrice === 'any');
-        })
-        .filter(function (pin) {
-          return (pin.offer.rooms === parseInt(window.updatePinsList.pinRooms, 10)) || (window.updatePinsList.pinRooms === 'any');
-        })
-        .filter(function (pin) {
-          return (pin.offer.guests === parseInt(window.updatePinsList.pinGuests, 10)) || (window.updatePinsList.pinGuests === 'any');
-        })
-        .filter(function (pin) {
-          return (includeFeature(pin, 'wifi', window.filter.checkboxWifi.checked) === true) || (window.filter.checkboxWifi.checked === false);
-        })
-        .filter(function (pin) {
-          return (includeFeature(pin, 'dishwasher', window.filter.checkboxDishwasher.checked) === true) ||
-          (window.filter.checkboxDishwasher.checked === false);
-        })
-        .filter(function (pin) {
-          return (includeFeature(pin, 'parking', window.filter.checkboxParking.checked) === true) ||
-          (window.filter.checkboxParking.checked === false);
-        })
-        .filter(function (pin) {
-          return (includeFeature(pin, 'washer', window.filter.checkboxWasher.checked) === true) ||
-          (window.filter.checkboxWasher.checked === false);
-        })
-        .filter(function (pin) {
-          return (includeFeature(pin, 'elevator', window.filter.checkboxElevator.checked) === true) ||
-          (window.filter.checkboxElevator.checked === false);
-        })
-        .filter(function (pin) {
-          return (includeFeature(pin, 'conditioner', window.filter.checkboxConditioner.checked) === true) ||
-          (window.filter.checkboxConditioner.checked === false);
+          var filters = Object.keys(window.filter.filterList);
+
+          return filters.every(function (filterType) {
+            return window.updatePinsList.filterCheck(
+                window.filter.filterList[filterType],
+                pin,
+                filterType,
+                window.filter.filterUpdateCallbacks[filterType]
+            );
+          }) && window.updatePinsList.checkForFeatures(pin);
         });
 
       var newPinsFragment = window.mapFile.renderFragment(window.updatePinsList.newPinsList);
@@ -101,28 +83,8 @@
           }
         }
       });
-    }
+    })
   };
-
-  window.filter.bookingPin.onTypeChange = window.debounce(function (type) {
-    window.updatePinsList.pinType = type;
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onPriceChange = window.debounce(function (price) {
-    window.updatePinsList.pinPrice = price;
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onRoomsChange = window.debounce(function (rooms) {
-    window.updatePinsList.pinRooms = rooms;
-    window.updatePinsList.updateBookingPins();
-  });
-
-  window.filter.bookingPin.onGuestsChange = window.debounce(function (guests) {
-    window.updatePinsList.pinGuests = guests;
-    window.updatePinsList.updateBookingPins();
-  });
 
   window.updatePinsList.onLoad = function (data) {
     window.updatePinsList.pinsList = data;

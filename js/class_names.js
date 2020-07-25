@@ -32,6 +32,7 @@
     resetButton: '.ad-form__reset',
     success: '.success',
     error: '.error',
-    errorButton: '.error__button'
+    errorButton: '.error__button',
+    checkBoxFeaturesWrapper: '.map__features'
   };
 })();

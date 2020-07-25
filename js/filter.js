@@ -2,20 +2,6 @@
 
 (function () {
   var filterForm = document.querySelector('.map__filters');
-  var bookingPin = {
-    onTypeChange: function (type) {
-      return type;
-    },
-    onPriceChange: function (price) {
-      return price;
-    },
-    onRoomsChange: function (rooms) {
-      return rooms;
-    },
-    onGuestsChange: function (guests) {
-      return guests;
-    }
-  };
 
   var nullifyFilter = function () {
     window.updatePinsList.mapPins = document.querySelector(window.ClassNames.mapPins);
@@ -30,37 +16,75 @@
     window.form.hideCard();
   };
 
+  var typeUpdate = function (pin, filterType, filterStatus) {
+    return pin.offer.type === filterStatus;
+  };
+  var priceUpdate = function (pin, filterType, filterStatus) {
+    switch (filterStatus) {
+      case 'low':
+        if (pin.offer.price >= 10000) {
+          return false;
+        }
+        break;
+      case 'middle':
+        if (pin.offer.price < 10000 || pin.offer.price > 50000) {
+          return false;
+        }
+        break;
+      case 'high':
+        if (pin.offer.price < 50000) {
+          return false;
+        }
+        break;
+    }
+
+    return true;
+  };
+  var roomsGuestsUpdate = function (pin, filterType, filterStatus) {
+    var OFFER_TYPE = filterType.split('housing-')[1];
+
+    return pin.offer[OFFER_TYPE] === parseInt(filterStatus, 10);
+  };
+
   window.filter = {
+    filterList: {
+      'housing-type': 'any',
+      'housing-price': 'any',
+      'housing-guests': 'any',
+      'housing-rooms': 'any'
+    },
+    filterUpdateCallbacks: {
+      'housing-type': typeUpdate,
+      'housing-price': priceUpdate,
+      'housing-guests': roomsGuestsUpdate,
+      'housing-rooms': roomsGuestsUpdate
+    },
+    checkboxFilterList: {
+      parking: false,
+      washer: false,
+      elevator: false,
+      dishwasher: false,
+      wifi: false,
+      conditioner: false
+    },
+    checkboxWrapper: document.querySelector(window.ClassNames.checkBoxFeaturesWrapper),
     selectPinType: document.querySelector('select[name="housing-type"]'),
     selectPinPrice: document.querySelector('select[name="housing-price"]'),
     selectPinRooms: document.querySelector('select[name="housing-rooms"]'),
     selectPinGuests: document.querySelector('select[name="housing-guests"]'),
-    checkboxWifi: document.querySelector('#filter-wifi'),
-    checkboxDishwasher: document.querySelector('#filter-dishwasher'),
-    checkboxParking: document.querySelector('#filter-parking'),
-    checkboxWasher: document.querySelector('#filter-washer'),
-    checkboxElevator: document.querySelector('#filter-elevator'),
-    checkboxConditioner: document.querySelector('#filter-conditioner'),
-    setupPinTypeClick: function () {
-      nullifyFilter();
-      bookingPin.onTypeChange(window.filter.selectPinType.value);
-    },
-    setupPinPriceClick: function () {
-      nullifyFilter();
-      bookingPin.onPriceChange(window.filter.selectPinPrice.value);
-    },
-    setupPinRoomsClick: function () {
-      nullifyFilter();
-      bookingPin.onRoomsChange(window.filter.selectPinRooms.value);
-    },
-    setupPinGuestsClick: function () {
-      nullifyFilter();
-      bookingPin.onGuestsChange(window.filter.selectPinGuests.value);
-    },
-    setupFilterCheckboxClick: window.debounce(function () {
+
+    onSelectChange: function (evt) {
+      window.filter.updateFilterList(evt.target.id, evt.target.value);
       nullifyFilter();
       window.updatePinsList.updateBookingPins();
-    }),
+    },
+    onCheckBoxWrapperClick: function (evt) {
+      if (evt.target.tagName.toLowerCase() === 'input') {
+        window.filter.updateCheckboxFilterList(evt.target.value);
+        nullifyFilter();
+        window.updatePinsList.updateBookingPins();
+      }
+    },
     resetFilter: function () {
       filterForm.reset();
       nullifyFilter();
@@ -69,20 +93,18 @@
       window.updatePinsList.pinRooms = 'any';
       window.updatePinsList.pinGuests = 'any';
       window.updatePinsList.updateBookingPins();
+    },
+    updateFilterList: function (filter, value) {
+      window.filter.filterList[filter] = value;
+    },
+    updateCheckboxFilterList: function (filter) {
+      window.filter.checkboxFilterList[filter] = !window.filter.checkboxFilterList[filter];
     }
   };
 
-  window.filter.selectPinType.addEventListener('change', window.filter.setupPinTypeClick);
-  window.filter.selectPinPrice.addEventListener('change', window.filter.setupPinPriceClick);
-  window.filter.selectPinRooms.addEventListener('change', window.filter.setupPinRoomsClick);
-  window.filter.selectPinGuests.addEventListener('change', window.filter.setupPinGuestsClick);
-  window.filter.checkboxWifi.addEventListener('change', window.filter.setupFilterCheckboxClick);
-  window.filter.checkboxDishwasher.addEventListener('change', window.filter.setupFilterCheckboxClick);
-  window.filter.checkboxParking.addEventListener('change', window.filter.setupFilterCheckboxClick);
-  window.filter.checkboxWasher.addEventListener('change', window.filter.setupFilterCheckboxClick);
-  window.filter.checkboxElevator.addEventListener('change', window.filter.setupFilterCheckboxClick);
-  window.filter.checkboxConditioner.addEventListener('change', window.filter.setupFilterCheckboxClick);
-
-  window.filter.bookingPin = bookingPin;
-  return window.filter.bookingPin;
+  window.filter.checkboxWrapper.addEventListener('click', window.filter.onCheckBoxWrapperClick);
+  window.filter.selectPinType.addEventListener('change', window.filter.onSelectChange);
+  window.filter.selectPinPrice.addEventListener('change', window.filter.onSelectChange);
+  window.filter.selectPinRooms.addEventListener('change', window.filter.onSelectChange);
+  window.filter.selectPinGuests.addEventListener('change', window.filter.onSelectChange);
 })();
