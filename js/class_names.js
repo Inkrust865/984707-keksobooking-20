@@ -19,6 +19,7 @@
     mapOverlay: '.map__overlay',
     mapPins: '.map__pins',
     mapPin: '.map__pin',
+    mapPinActive: '.map__pin--active',
     mapCard: '.map__card',
     map: '.map',
     mapFaded: '.map--faded',
@@ -31,6 +32,7 @@
     resetButton: '.ad-form__reset',
     success: '.success',
     error: '.error',
-    errorButton: '.error__button'
+    errorButton: '.error__button',
+    checkBoxFeaturesWrapper: '.map__features'
   };
 })();

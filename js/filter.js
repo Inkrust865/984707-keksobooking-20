@@ -1,16 +1,7 @@
 'use strict';
 
 (function () {
-  var bookingPin = {
-    onTypeChange: function (type) {
-      return type;
-    }
-  };
-
-  var selectPinType = document.querySelector('select[name="housing-type"]');
-  var selectPinPrice = document.querySelector('select[name="housing-price"]');
-  var selectPinRooms = document.querySelector('select[name="housing-rooms"]');
-  var selectPinGuests = document.querySelector('select[name="housing-guests"]');
+  var filterForm = document.querySelector('.map__filters');
 
   var nullifyFilter = function () {
     window.updatePinsList.mapPins = document.querySelector(window.ClassNames.mapPins);
@@ -25,27 +16,95 @@
     window.form.hideCard();
   };
 
+  var typeUpdate = function (pin, filterType, filterStatus) {
+    return pin.offer.type === filterStatus;
+  };
+  var priceUpdate = function (pin, filterType, filterStatus) {
+    switch (filterStatus) {
+      case 'low':
+        if (pin.offer.price >= 10000) {
+          return false;
+        }
+        break;
+      case 'middle':
+        if (pin.offer.price < 10000 || pin.offer.price > 50000) {
+          return false;
+        }
+        break;
+      case 'high':
+        if (pin.offer.price < 50000) {
+          return false;
+        }
+        break;
+    }
+
+    return true;
+  };
+  var roomsGuestsUpdate = function (pin, filterType, filterStatus) {
+    var OFFER_TYPE = filterType.split('housing-')[1];
+
+    return pin.offer[OFFER_TYPE] === parseInt(filterStatus, 10);
+  };
+
   window.filter = {
-    setupPinTypeClick: function () {
-      nullifyFilter();
-      bookingPin.onTypeChange(selectPinType.value);
+    filterList: {
+      'housing-type': 'any',
+      'housing-price': 'any',
+      'housing-guests': 'any',
+      'housing-rooms': 'any'
     },
-    setupPinPriceClick: function () {
-      nullifyFilter();
+    filterUpdateCallbacks: {
+      'housing-type': typeUpdate,
+      'housing-price': priceUpdate,
+      'housing-guests': roomsGuestsUpdate,
+      'housing-rooms': roomsGuestsUpdate
     },
-    setupPinRoomsClick: function () {
-      nullifyFilter();
+    checkboxFilterList: {
+      parking: false,
+      washer: false,
+      elevator: false,
+      dishwasher: false,
+      wifi: false,
+      conditioner: false
     },
-    setupPinGuestsClick: function () {
+    checkboxWrapper: document.querySelector(window.ClassNames.checkBoxFeaturesWrapper),
+    selectPinType: document.querySelector('select[name="housing-type"]'),
+    selectPinPrice: document.querySelector('select[name="housing-price"]'),
+    selectPinRooms: document.querySelector('select[name="housing-rooms"]'),
+    selectPinGuests: document.querySelector('select[name="housing-guests"]'),
+
+    onSelectChange: function (evt) {
+      window.filter.updateFilterList(evt.target.id, evt.target.value);
       nullifyFilter();
+      window.updatePinsList.updateBookingPins();
+    },
+    onCheckBoxWrapperClick: function (evt) {
+      if (evt.target.tagName.toLowerCase() === 'input') {
+        window.filter.updateCheckboxFilterList(evt.target.value);
+        nullifyFilter();
+        window.updatePinsList.updateBookingPins();
+      }
+    },
+    resetFilter: function () {
+      filterForm.reset();
+      nullifyFilter();
+      window.updatePinsList.pinType = 'any';
+      window.updatePinsList.pinPrice = 'any';
+      window.updatePinsList.pinRooms = 'any';
+      window.updatePinsList.pinGuests = 'any';
+      window.updatePinsList.updateBookingPins();
+    },
+    updateFilterList: function (filter, value) {
+      window.filter.filterList[filter] = value;
+    },
+    updateCheckboxFilterList: function (filter) {
+      window.filter.checkboxFilterList[filter] = !window.filter.checkboxFilterList[filter];
     }
   };
 
-  selectPinType.addEventListener('change', window.filter.setupPinTypeClick);
-  selectPinPrice.addEventListener('change', window.filter.setupPinPriceClick);
-  selectPinRooms.addEventListener('change', window.filter.setupPinRoomsClick);
-  selectPinGuests.addEventListener('change', window.filter.setupPinGuestsClick);
-
-  window.filter.bookingPin = bookingPin;
-  return window.filter.bookingPin;
+  window.filter.checkboxWrapper.addEventListener('click', window.filter.onCheckBoxWrapperClick);
+  window.filter.selectPinType.addEventListener('change', window.filter.onSelectChange);
+  window.filter.selectPinPrice.addEventListener('change', window.filter.onSelectChange);
+  window.filter.selectPinRooms.addEventListener('change', window.filter.onSelectChange);
+  window.filter.selectPinGuests.addEventListener('change', window.filter.onSelectChange);
 })();

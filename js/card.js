@@ -4,7 +4,7 @@
   window.card = {
     renderCard: function (index) {
       var pinCard = mapCardTemplate.cloneNode(true);
-      var chosenOffer = window.updatePinsList.pinsList[index - 1];
+      var chosenOffer = window.updatePinsList.newPinsList[index - 1];
 
       pinCard.querySelector(window.ClassNames.popupTitle).textContent = chosenOffer.offer.title;
       pinCard.querySelector(window.ClassNames.popupAddress).textContent = chosenOffer.offer.address;
@@ -24,33 +24,37 @@
       return pinCard;
     },
     openCard: function (index) {
-      if (document.querySelectorAll(window.ClassNames.mapCard).length < 1) {
-        window.mapFile.map.insertBefore(window.card.renderCard(index), window.mapFile.map.querySelector(window.ClassNames.filtersContainer));
+      if (document.querySelector(window.ClassNames.mapCard)) {
+        window.card.closeCard();
+        window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
+        document.removeEventListener('keydown', window.card.closeCardEscPress);
+      }
 
-        var mapCard = document.querySelector(window.ClassNames.mapCard);
-        window.card.cardClose = document.querySelector(window.ClassNames.popupClose);
+      window.mapFile.map.insertBefore(window.card.renderCard(index), window.mapFile.map.querySelector(window.ClassNames.filtersContainer));
 
-        var closeCard = function () {
-          window.mapFile.map.removeChild(mapCard);
-        };
+      var mapCard = document.querySelector(window.ClassNames.mapCard);
+      window.card.cardClose = document.querySelector(window.ClassNames.popupClose);
 
-        window.card.onCardClosePress = function () {
-          closeCard();
+      window.card.closeCard = function () {
+        window.mapFile.map.removeChild(mapCard);
+      };
+
+      window.card.onCardClosePress = function () {
+        window.card.closeCard();
+        window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
+        document.removeEventListener('keydown', window.card.closeCardEscPress);
+      };
+
+      window.card.closeCardEscPress = function (evt) {
+        window.util.onEscPress(evt, function () {
+          window.card.closeCard();
           window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
           document.removeEventListener('keydown', window.card.closeCardEscPress);
-        };
+        });
+      };
 
-        window.card.closeCardEscPress = function (evt) {
-          window.util.onEscPress(evt, function () {
-            closeCard();
-            window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
-            document.removeEventListener('keydown', window.card.closeCardEscPress);
-          });
-        };
-
-        window.card.cardClose.addEventListener('click', window.card.onCardClosePress);
-        document.addEventListener('keydown', window.card.closeCardEscPress);
-      }
+      window.card.cardClose.addEventListener('click', window.card.onCardClosePress);
+      document.addEventListener('keydown', window.card.closeCardEscPress);
     }
   };
 
