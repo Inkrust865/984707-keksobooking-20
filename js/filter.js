@@ -88,10 +88,24 @@
     resetFilter: function () {
       filterForm.reset();
       nullifyFilter();
-      window.updatePinsList.pinType = 'any';
-      window.updatePinsList.pinPrice = 'any';
-      window.updatePinsList.pinRooms = 'any';
-      window.updatePinsList.pinGuests = 'any';
+
+      var startingValueFilters = [
+        {filterList: window.filter.filterList, filterValue: 'any'},
+        {filterList: window.filter.checkboxFilterList, filterValue: false}
+      ];
+
+      var resetFilterValues = function (filterList, filterValue) {
+        var filterNames = Object.keys(filterList);
+
+        filterNames.forEach(function (filterName) {
+          filterList[filterName] = filterValue;
+        });
+      };
+
+      startingValueFilters.forEach(function (filter) {
+        resetFilterValues(filter.filterList, filter.filterValue);
+      });
+
       window.updatePinsList.updateBookingPins();
     },
     updateFilterList: function (filter, value) {
