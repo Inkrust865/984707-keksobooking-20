@@ -11,7 +11,9 @@
     },
     MainPinDisabled: {
       X: 31,
-      Y: 31
+      Y: 31,
+      INITIAL_COORD_X: '570px',
+      INITIAL_COORD_Y: '375px'
     },
     disableFields: function (formFields) {
       Array.from(formFields)
@@ -29,6 +31,10 @@
       renderMinPriceType();
     },
     renderAddress: function (typeMainPin) {
+      if (typeMainPin === window.form.MainPinDisabled) {
+        window.form.mapPinMain.style.top = window.form.MainPinDisabled.INITIAL_COORD_Y;
+        window.form.mapPinMain.style.left = window.form.MainPinDisabled.INITIAL_COORD_X;
+      }
       var top = Math.floor(parseInt(window.form.mapPinMain.style.top, 10));
       var left = Math.floor(parseInt(window.form.mapPinMain.style.left, 10));
       var mainPinX = left + typeMainPin.X;
