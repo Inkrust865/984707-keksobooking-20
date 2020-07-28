@@ -1,22 +1,31 @@
 'use strict';
 
 (function () {
-  var mapPinBorderRight = window.mapFile.map.clientWidth - window.form.MainPinActive.X;
-  var mapPinBorderLeft = -(window.form.MainPinActive.X);
   var MapCity = {
     MIN_Y: 130,
     MAX_Y: 630
   };
+
+  var mapPinBorderRight = window.mapFile.map.clientWidth - window.form.MainPinActive.X;
+  var mapPinBorderLeft = -(window.form.MainPinActive.X);
   var mapPinBorderTop = MapCity.MIN_Y - window.form.MainPinActive.Y;
   var mapPinBorderBottom = MapCity.MAX_Y - window.form.MainPinActive.Y;
 
+  var onMainPinFirstPress = function (evt) {
+    if (window.mapFile.map.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.MAP_FADED))) {
+      if (evt.button === window.main.MouseButtons.LEFT) {
+        window.main.activatePage(evt);
+      }
+    }
+  };
+
   window.form.mapPinMain.addEventListener('mousedown', function (evt) {
-    window.main.onMainPinFirstPress(evt);
+    onMainPinFirstPress(evt);
     evt.preventDefault();
 
-    Array.from(window.updatePinsList.mapPinList).forEach(function (pin) {
-      pin.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.mapPinActive));
-      window.form.mapPinMain.classList.add(window.util.getClassWithoutPoint(window.ClassNames.mapPinActive));
+    Array.from(window.pinsList.mapPinList).forEach(function (pin) {
+      pin.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.MAP_PIN_ACTIVE));
+      window.form.mapPinMain.classList.add(window.util.getClassWithoutPoint(window.ClassNames.MAP_PIN_ACTIVE));
     });
 
     var startCoords = {

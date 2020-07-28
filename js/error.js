@@ -1,23 +1,27 @@
 'use strict';
 
 (function () {
+  var onErrorPost = function () {
+    window.form.renderErrorMessage();
+
+    document.addEventListener('keydown', window.form.onErrorMessageEscPress);
+    document.addEventListener('click', window.form.onErrorMessageMousePress);
+  };
+
+  var onErrorGet = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
   window.error = {
-    onErrorPost: function () {
-      window.formMessage.renderErrorMessage();
-
-      document.addEventListener('keydown', window.formMessage.onErrorMessageEscPress);
-      document.addEventListener('click', window.formMessage.onErrorMessageMousePress);
-    },
-    onErrorGet: function (errorMessage) {
-      var node = document.createElement('div');
-      node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
-      node.style.position = 'absolute';
-      node.style.left = 0;
-      node.style.right = 0;
-      node.style.fontSize = '30px';
-
-      node.textContent = errorMessage;
-      document.body.insertAdjacentElement('afterbegin', node);
-    }
+    onErrorPost: onErrorPost,
+    onErrorGet: onErrorGet
   };
 })();

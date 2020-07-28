@@ -1,75 +1,73 @@
 'use strict';
 
 (function () {
-  window.form = {
-    adForm: document.querySelector(window.ClassNames.adForm),
-    resetButton: document.querySelector(window.ClassNames.resetButton),
-    mapPinMain: document.querySelector(window.ClassNames.mainPin),
-    MainPinActive: {
-      X: 33,
-      Y: 84
-    },
-    MainPinDisabled: {
-      X: 31,
-      Y: 31,
-      INITIAL_COORD_X: '570px',
-      INITIAL_COORD_Y: '375px'
-    },
-    disableFields: function (formFields) {
-      Array.from(formFields)
-        .forEach(function (element) {
-          element.disabled = true;
-        });
-    },
-    activateFields: function (formFields) {
-      Array.from(formFields)
-        .forEach(function (element) {
-          element.disabled = false;
-        });
-
-      renderInitialStateCapacity();
-      renderMinPriceType();
-    },
-    renderAddress: function (typeMainPin) {
-      if (typeMainPin === window.form.MainPinDisabled) {
-        window.form.mapPinMain.style.top = window.form.MainPinDisabled.INITIAL_COORD_Y;
-        window.form.mapPinMain.style.left = window.form.MainPinDisabled.INITIAL_COORD_X;
-      }
-      var top = Math.floor(parseInt(window.form.mapPinMain.style.top, 10));
-      var left = Math.floor(parseInt(window.form.mapPinMain.style.left, 10));
-      var mainPinX = left + typeMainPin.X;
-      var mainPinY = top + typeMainPin.Y;
-
-      inputAddress.value = mainPinX + ', ' + mainPinY;
-    },
-    hideCard: function () {
-      var card = window.mapFile.map.querySelector(window.ClassNames.mapCard);
-      if (!card) {
-        return;
-      } else {
-        window.mapFile.map.removeChild(card);
-        window.card.cardClose.removeEventListener('click', window.card.onCardClosePress);
-        document.removeEventListener('keydown', window.card.closeCardEscPress);
-      }
-    }
-  };
-
-  var selectList = window.form.adForm.querySelectorAll('select');
-  var selectType = window.form.adForm.querySelector('select[name="type"]');
-  var selectTimein = window.form.adForm.querySelector('select[name="timein"]');
-  var selectTimeout = window.form.adForm.querySelector('select[name="timeout"]');
-  var inputAddress = window.form.adForm.querySelector('input[name="address"]');
-  var inputTitle = window.form.adForm.querySelector('input[name="title"]');
-  var inputPrice = window.form.adForm.querySelector('input[name="price"]');
+  var adForm = document.querySelector(window.ClassNames.AD_FORM);
+  var resetButton = document.querySelector(window.ClassNames.RESET_BUTTON);
+  var mapPinMain = document.querySelector(window.ClassNames.MAIN_PIN);
+  var selectList = adForm.querySelectorAll('select');
+  var selectType = adForm.querySelector('select[name="type"]');
+  var selectTimein = adForm.querySelector('select[name="timein"]');
+  var selectTimeout = adForm.querySelector('select[name="timeout"]');
+  var inputAddress = adForm.querySelector('input[name="address"]');
+  var inputTitle = adForm.querySelector('input[name="title"]');
+  var inputPrice = adForm.querySelector('input[name="price"]');
   var roomNumber = document.querySelector('#room_number');
   var capacity = document.querySelector('#capacity');
   var capacityOptions = capacity.querySelectorAll('option');
+  var tagMain = document.querySelector('main');
+  var successMessageTemplate = document.querySelector('#success')
+    .content
+    .querySelector(window.ClassNames.SUCCESS);
+  var errorMessageTemplate = document.querySelector('#error')
+    .content
+    .querySelector(window.ClassNames.ERROR);
+  var successMessage = successMessageTemplate.cloneNode(true);
+  var errorMessage = errorMessageTemplate.cloneNode(true);
+
   var roomsAndGuestsRules = [
     {roomNumber: '1', capacityValues: ['1']},
     {roomNumber: '2', capacityValues: ['1', '2']},
     {roomNumber: '3', capacityValues: ['1', '2', '3']},
     {roomNumber: '100', capacityValues: ['0']}
   ];
+  var MainPinActive = {
+    X: 33,
+    Y: 84
+  };
+  var MainPinDisabled = {
+    X: 31,
+    Y: 31,
+    INITIAL_COORD_X: '570px',
+    INITIAL_COORD_Y: '375px'
+  };
+
+  var disableFields = function (formFields) {
+    Array.from(formFields)
+      .forEach(function (element) {
+        element.disabled = true;
+      });
+  };
+
+  var activateFields = function (formFields) {
+    Array.from(formFields)
+      .forEach(function (element) {
+        element.disabled = false;
+      });
+    renderInitialStateCapacity();
+    renderMinPriceType();
+  };
+
+  var renderAddress = function (typeMainPin) {
+    if (typeMainPin === MainPinDisabled) {
+      mapPinMain.style.top = MainPinDisabled.INITIAL_COORD_Y;
+      mapPinMain.style.left = MainPinDisabled.INITIAL_COORD_X;
+    }
+    var top = Math.floor(parseInt(mapPinMain.style.top, 10));
+    var left = Math.floor(parseInt(mapPinMain.style.left, 10));
+    var mainPinX = left + typeMainPin.X;
+    var mainPinY = top + typeMainPin.Y;
+    inputAddress.value = mainPinX + ', ' + mainPinY;
+  };
 
   var inputTitleInvalid = function () {
     if (inputTitle.validity.tooShort) {
@@ -82,8 +80,6 @@
       inputTitle.setCustomValidity('');
     }
   };
-
-  inputTitle.addEventListener('invalid', inputTitleInvalid);
 
   var inputTitleInput = function () {
     var valueLength = inputTitle.value.length;
@@ -98,8 +94,6 @@
       inputTitle.setCustomValidity('');
     }
   };
-
-  inputTitle.addEventListener('input', inputTitleInput);
 
   var renderMinPriceType = function () {
     var compliancesTypeMinPrice = [
@@ -121,19 +115,13 @@
     renderMinPriceType();
   };
 
-  selectType.addEventListener('change', selectTypeChange);
-
   var selectTimeinChange = function () {
     selectTimeout.value = selectTimein.value;
   };
 
-  selectTimein.addEventListener('change', selectTimeinChange);
-
   var selectTimeoutChange = function () {
     selectTimein.value = selectTimeout.value;
   };
-
-  selectTimeout.addEventListener('change', selectTimeoutChange);
 
   var renderInitialStateCapacity = function () {
     capacityOptions.forEach(function (option) {
@@ -180,9 +168,6 @@
     setValidityRule();
   };
 
-  roomNumber.addEventListener('change', onRoomNumberChange);
-  capacity.addEventListener('change', onCapacityChange);
-
   var cleanSelect = function () {
     Array.from(selectList).forEach(function (select) {
       var currentValue = select.querySelector('option[selected]');
@@ -192,34 +177,12 @@
     });
   };
 
-  var cleanAvatarImg = function () {
-    var avatarPreviewBlock = document.querySelector('.ad-form-header__preview');
-
-    if (window.chooseImages.avatarPreview) {
-      avatarPreviewBlock.removeChild(window.chooseImages.avatarPreview);
-      var newAvatarPreview = document.createElement('img');
-      newAvatarPreview.src = 'img/muffin-grey.svg';
-      newAvatarPreview.alt = 'Аватар пользователя';
-      newAvatarPreview.width = '40';
-      newAvatarPreview.height = '44';
-      avatarPreviewBlock.appendChild(newAvatarPreview);
-    }
-  };
-
-  var cleanImgChooser = function () {
-    cleanAvatarImg();
-
-    if (window.chooseImages.housingPreview) {
-      window.chooseImages.housingPreviewBlock.removeChild(window.chooseImages.housingPreview);
-    }
-  };
-
   var cleanFields = function () {
-    window.form.adForm.reset();
+    adForm.reset();
     cleanSelect();
-    cleanImgChooser();
+    window.previewImages.cleanImgChooser();
 
-    window.form.renderAddress(window.form.MainPinActive);
+    renderAddress(MainPinActive);
   };
 
   var onResetButton = function (evt) {
@@ -227,44 +190,80 @@
 
     window.main.disablePage();
     cleanFields();
-    window.form.hideCard();
+    window.card.hideCard();
   };
 
-  window.form.resetButton.addEventListener('click', onResetButton);
+  var renderSuccessMessage = function () {
+    tagMain.appendChild(successMessage);
+  };
+
+  var renderErrorMessage = function () {
+    tagMain.appendChild(errorMessage);
+  };
+
+  var onSuccessMessageEscPress = function (evt) {
+    window.formMessage.onFormMessageEscPress(evt, successMessage);
+  };
+
+  var onSuccessMessageMousePress = function (evt) {
+    window.formMessage.onFormMessageMousePress(evt, successMessage);
+  };
+
+  var onErrorMessageEscPress = function (evt) {
+    window.formMessage.onFormMessageEscPress(evt, errorMessage);
+  };
+
+  var onErrorMessageMousePress = function (evt) {
+    window.formMessage.onFormMessageMousePress(evt, errorMessage);
+  };
 
   var onPublish = function () {
-    window.formMessage.renderSuccessMessage();
+    renderSuccessMessage();
 
-    document.addEventListener('keydown', window.formMessage.onSuccessMessageEscPress);
-    document.addEventListener('click', window.formMessage.onSuccessMessageMousePress);
+    document.addEventListener('keydown', onSuccessMessageEscPress);
+    document.addEventListener('click', onSuccessMessageMousePress);
 
     window.main.disablePage();
     cleanFields();
-    window.form.hideCard();
+    window.card.hideCard();
 
     Array.from(window.main.mapPinList).forEach(function (pin) {
-      if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.mainPin))) {
-        window.updatePinsList.mapPins.removeChild(pin);
+      if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.MAIN_PIN))) {
+        window.pinsList.mapPins.removeChild(pin);
       }
     });
-
-    capacity.removeEventListener('invalid', onCapacityChange);
-    roomNumber.removeEventListener('change', onRoomNumberChange);
-    inputTitle.removeEventListener('invalid', inputTitleInvalid);
-    inputTitle.removeEventListener('input', inputTitleInput);
-    selectType.removeEventListener('change', selectTypeChange);
-    selectTimein.addEventListener('change', selectTimeinChange);
-    selectTimeout.addEventListener('change', selectTimeoutChange);
   };
 
-  window.form.adForm.addEventListener('submit', function (evt) {
-    evt.preventDefault();
-    window.backend.publish(new FormData(window.form.adForm), onPublish, window.error.onErrorPost);
+  inputTitle.addEventListener('invalid', inputTitleInvalid);
+  inputTitle.addEventListener('input', inputTitleInput);
+  selectType.addEventListener('change', selectTypeChange);
+  selectTimein.addEventListener('change', selectTimeinChange);
+  selectTimeout.addEventListener('change', selectTimeoutChange);
+  roomNumber.addEventListener('change', onRoomNumberChange);
+  capacity.addEventListener('change', onCapacityChange);
+  resetButton.addEventListener('click', onResetButton);
 
-    window.form.resetButton.removeEventListener('click', cleanFields);
-    document.removeEventListener('keydown', window.formMessage.onSuccessMessageEscPress);
-    document.removeEventListener('click', window.formMessage.onSuccessMessageMousePress);
-    document.removeEventListener('keydown', window.formMessage.onErrorMessageEscPress);
-    document.removeEventListener('click', window.formMessage.onErrorMessageMousePress);
+  adForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.publish(new FormData(adForm), onPublish, window.error.onErrorPost);
+
+    document.removeEventListener('keydown', onSuccessMessageEscPress);
+    document.removeEventListener('click', onSuccessMessageMousePress);
+    document.removeEventListener('keydown', onErrorMessageEscPress);
+    document.removeEventListener('click', onErrorMessageMousePress);
   });
+
+  window.form = {
+    adForm: adForm,
+    tagMain: tagMain,
+    mapPinMain: mapPinMain,
+    MainPinActive: MainPinActive,
+    MainPinDisabled: MainPinDisabled,
+    disableFields: disableFields,
+    activateFields: activateFields,
+    renderAddress: renderAddress,
+    onErrorMessageEscPress: onErrorMessageEscPress,
+    onErrorMessageMousePress: onErrorMessageMousePress,
+    renderErrorMessage: renderErrorMessage
+  };
 })();
