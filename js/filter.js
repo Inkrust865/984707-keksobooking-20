@@ -75,10 +75,7 @@
   };
 
   var nullifyFilter = function () {
-    window.pinsList.mapPins = document.querySelector(window.ClassNames.MAP_PINS);
-    var mapPinList = window.pinsList.mapPins.querySelectorAll(window.ClassNames.MAP_PIN);
-
-    Array.from(mapPinList).forEach(function (pin) {
+    Array.from(window.pinsList.mapPinList).forEach(function (pin) {
       if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.MAIN_PIN))) {
         window.pinsList.mapPins.removeChild(pin);
       }

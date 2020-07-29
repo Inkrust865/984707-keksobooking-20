@@ -23,7 +23,7 @@
     onMainPinFirstPress(evt);
     evt.preventDefault();
 
-    Array.from(window.pinsList.mapPinList).forEach(function (pin) {
+    Array.from(window.main.mapPinList).forEach(function (pin) {
       pin.classList.remove(window.util.getClassWithoutPoint(window.ClassNames.MAP_PIN_ACTIVE));
       window.form.mapPinMain.classList.add(window.util.getClassWithoutPoint(window.ClassNames.MAP_PIN_ACTIVE));
     });

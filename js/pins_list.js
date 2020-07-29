@@ -2,6 +2,7 @@
 
 (function () {
   var mapPins = document.querySelector(window.ClassNames.MAP_PINS);
+  var pinsList;
 
   var includeFeature = function (pin, featureName) {
     return pin.offer.features.some(function (feature) {
@@ -36,8 +37,8 @@
   };
 
   var updateBookingPins = window.debounce(function () {
-    if (window.pinsList.pinsList) {
-      window.pinsList.newPinsList = window.pinsList.pinsList
+    if (pinsList) {
+      window.pinsList.newPinsList = pinsList
         .filter(function (pin) {
           var filters = Object.keys(window.filter.filterList);
 
@@ -88,8 +89,20 @@
     });
   });
 
+  var onErrorGet = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
   var onLoad = function (data) {
-    window.pinsList.pinsList = data;
+    pinsList = data;
     updateBookingPins();
     window.form.activateFields(window.filter.filterForm);
   };
@@ -99,5 +112,5 @@
     updateBookingPins: updateBookingPins
   };
 
-  window.backend.load(onLoad, window.error.onErrorGet);
+  window.backend.load(onLoad, onErrorGet);
 })();

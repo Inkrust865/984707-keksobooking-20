@@ -15,6 +15,10 @@
     .content
     .querySelector(window.ClassNames.MAP_CARD);
   var filtersContainer = window.mapFile.map.querySelector(window.ClassNames.FILTERS_CONTAINER);
+  var mapCard;
+  var onCardClosePress;
+  var closeCardEscPress;
+  var cardClose;
 
   var renderType = function (type, card) {
     var typeCard = card.querySelector(window.ClassNames.POPUP_TYPE);
@@ -126,44 +130,44 @@
     return pinCard;
   };
 
+  var closeCard = function (card) {
+    window.mapFile.map.removeChild(card);
+  };
+
   var openCard = function (index) {
     if (document.querySelector(window.ClassNames.MAP_CARD)) {
-      window.card.closeCard();
-      document.removeEventListener('keydown', window.card.closeCardEscPress);
+      closeCard(mapCard);
+      document.removeEventListener('keydown', closeCardEscPress);
     }
 
     window.mapFile.map.insertBefore(window.card.renderCard(index), filtersContainer);
 
-    var mapCard = document.querySelector(window.ClassNames.MAP_CARD);
-    window.card.cardClose = document.querySelector(window.ClassNames.POPUP_CLOSE);
+    mapCard = window.mapFile.map.querySelector(window.ClassNames.MAP_CARD);
+    cardClose = mapCard.querySelector(window.ClassNames.POPUP_CLOSE);
 
-    window.card.closeCard = function () {
-      window.mapFile.map.removeChild(mapCard);
+    onCardClosePress = function () {
+      closeCard(mapCard);
+      document.removeEventListener('keydown', closeCardEscPress);
     };
 
-    window.card.onCardClosePress = function () {
-      window.card.closeCard();
-      document.removeEventListener('keydown', window.card.closeCardEscPress);
-    };
-
-    window.card.closeCardEscPress = function (evt) {
+    closeCardEscPress = function (evt) {
       window.util.onEscPress(evt, function () {
-        window.card.closeCard();
-        document.removeEventListener('keydown', window.card.closeCardEscPress);
+        closeCard(mapCard);
+        document.removeEventListener('keydown', closeCardEscPress);
       });
     };
 
-    window.card.cardClose.addEventListener('click', window.card.onCardClosePress);
-    document.addEventListener('keydown', window.card.closeCardEscPress);
+    cardClose.addEventListener('click', onCardClosePress);
+    document.addEventListener('keydown', closeCardEscPress);
   };
 
   var hideCard = function () {
-    var card = window.mapFile.map.querySelector(window.ClassNames.MAP_CARD);
-    if (!card) {
+    mapCard = window.mapFile.map.querySelector(window.ClassNames.MAP_CARD);
+    if (!mapCard) {
       return;
     } else {
-      window.mapFile.map.removeChild(card);
-      document.removeEventListener('keydown', window.card.closeCardEscPress);
+      closeCard(mapCard);
+      document.removeEventListener('keydown', closeCardEscPress);
     }
   };
 

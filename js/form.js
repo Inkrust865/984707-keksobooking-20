@@ -190,7 +190,24 @@
 
     window.main.disablePage();
     cleanFields();
-    window.card.hideCard();
+  };
+
+  var hideFormMessage = function (messageElement) {
+    if (tagMain.lastChild === messageElement) {
+      tagMain.removeChild(messageElement);
+    }
+  };
+
+  var onFormMessageEscPress = function (evt, messageElement) {
+    window.util.onEscPress(evt, function () {
+      hideFormMessage(messageElement);
+    });
+  };
+
+  var onFormMessageMousePress = function (evt, messageElement) {
+    if (evt.button === window.main.MouseButtons.LEFT) {
+      hideFormMessage(messageElement);
+    }
   };
 
   var renderSuccessMessage = function () {
@@ -202,19 +219,26 @@
   };
 
   var onSuccessMessageEscPress = function (evt) {
-    window.formMessage.onFormMessageEscPress(evt, successMessage);
+    onFormMessageEscPress(evt, successMessage);
   };
 
   var onSuccessMessageMousePress = function (evt) {
-    window.formMessage.onFormMessageMousePress(evt, successMessage);
+    onFormMessageMousePress(evt, successMessage);
   };
 
   var onErrorMessageEscPress = function (evt) {
-    window.formMessage.onFormMessageEscPress(evt, errorMessage);
+    onFormMessageEscPress(evt, errorMessage);
   };
 
   var onErrorMessageMousePress = function (evt) {
-    window.formMessage.onFormMessageMousePress(evt, errorMessage);
+    onFormMessageMousePress(evt, errorMessage);
+  };
+
+  var onErrorPost = function () {
+    renderErrorMessage();
+
+    document.addEventListener('keydown', onErrorMessageEscPress);
+    document.addEventListener('click', onErrorMessageMousePress);
   };
 
   var onPublish = function () {
@@ -225,7 +249,6 @@
 
     window.main.disablePage();
     cleanFields();
-    window.card.hideCard();
 
     Array.from(window.main.mapPinList).forEach(function (pin) {
       if (!pin.classList.contains(window.util.getClassWithoutPoint(window.ClassNames.MAIN_PIN))) {
@@ -245,7 +268,7 @@
 
   adForm.addEventListener('submit', function (evt) {
     evt.preventDefault();
-    window.backend.publish(new FormData(adForm), onPublish, window.error.onErrorPost);
+    window.backend.publish(new FormData(adForm), onPublish, onErrorPost);
 
     document.removeEventListener('keydown', onSuccessMessageEscPress);
     document.removeEventListener('click', onSuccessMessageMousePress);
@@ -255,15 +278,11 @@
 
   window.form = {
     adForm: adForm,
-    tagMain: tagMain,
     mapPinMain: mapPinMain,
     MainPinActive: MainPinActive,
     MainPinDisabled: MainPinDisabled,
     disableFields: disableFields,
     activateFields: activateFields,
-    renderAddress: renderAddress,
-    onErrorMessageEscPress: onErrorMessageEscPress,
-    onErrorMessageMousePress: onErrorMessageMousePress,
-    renderErrorMessage: renderErrorMessage
+    renderAddress: renderAddress
   };
 })();
